@@ -2,8 +2,13 @@
 #define SHADER_H
 
 #include <vector>
+#include <string>
+#include <sstream>
+#include <fstream>
 
 #include "graphics_headers.h"
+
+using namespace std;
 
 class Shader
 {
@@ -13,11 +18,12 @@ class Shader
     bool Initialize();
     void Enable();
     bool AddShader(GLenum ShaderType);
+    bool LoadShader(GLenum ShaderType, std::string filename = "");
     bool Finalize();
     GLint GetUniformLocation(const char* pUniformName);
 
   private:
-    GLuint m_shaderProg;    
+    GLuint m_shaderProg;
     std::vector<GLuint> m_shaderObjList;
 };
 
