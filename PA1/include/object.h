@@ -3,9 +3,6 @@
 
 #include <cstdlib>
 #include <vector>
-#include <fstream>
-#include <string>
-
 #include "graphics_headers.h"
 
 #include <assimp/Importer.hpp>
@@ -14,16 +11,18 @@
 #include <assimp/color4.h>
 #include <glm/gtx/vector_angle.hpp>
 
+#include <fstream>
+#include <string>
 using namespace Assimp;
 
 class Object {
 public:
     Object();
     ~Object();
-    void Init(const std::string& filename);
+    bool Init(const std::string& filename);
     void Update(unsigned int dt);
     void Render();
-    void LoadVerticiesFromFile(const std::string& filename);
+    bool LoadVerticiesFromFile(const std::string& filename);
 
     glm::mat4 GetModel();
 

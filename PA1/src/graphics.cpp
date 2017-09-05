@@ -46,6 +46,10 @@ bool Graphics::Initialize(int width, int height)
 
   // Create the object
   m_cube = new Object();
+  if (!m_cube->Init("../meshes/Torus Knot.obj")) {
+    printf("Object failed to init\n");
+    return false;
+  }
 
   // Set up the shaders
   m_shader = new Shader();

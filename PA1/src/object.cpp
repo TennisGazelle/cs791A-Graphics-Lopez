@@ -1,7 +1,7 @@
 #include "object.h"
 
 Object::Object() {
-  Init("../meshes/peeps_model.obj");
+
 }
 
 Object::~Object() {
@@ -9,8 +9,11 @@ Object::~Object() {
   indices.clear();
 }
 
-void Object::Init(const std::string& filename) {
-  LoadVerticiesFromFile(filename);
+bool Object::Init(const std::string& filename) {
+  if (!LoadVerticiesFromFile(filename)) {
+    printf("Error loading file\n");
+    return false;
+  }
 
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -19,19 +22,20 @@ void Object::Init(const std::string& filename) {
   glGenBuffers(1, &IBO);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_STATIC_DRAW);
+  return true;
 }
 
-void Object::LoadVerticiesFromFile(const std::string& filename) {
+bool Object::LoadVerticiesFromFile(const std::string& filename) {
   //declare incoming variables stuff
   Assimp::Importer importer;
   const aiScene* aiScene = importer.ReadFile(filename, aiProcess_Triangulate);
   if (aiScene == NULL) {
     std::cerr << "File contents had problmes but was successfully opened." << std::endl;
-    return;
+    return false;
   }
 
     // iterate through the meshes and go through
-  for(int meshIndex = 0; meshIndex < aiScene->mNumMeshes; meshIndex++) {
+  for(unsigned int meshIndex = 0; meshIndex < aiScene->mNumMeshes; meshIndex++) {
     int numFacesInMesh = aiScene->mMeshes[meshIndex]->mNumFaces;
     //iterate through faces
     for(int faceIndex = 0; faceIndex < numFacesInMesh; faceIndex++) {
@@ -55,6 +59,7 @@ void Object::LoadVerticiesFromFile(const std::string& filename) {
       }
     }
   }
+  return true;
 }
 
 void Object::Update(unsigned int dt) {
