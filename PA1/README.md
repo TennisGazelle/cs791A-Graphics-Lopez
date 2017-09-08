@@ -1,4 +1,4 @@
-# PA1: Spinning Cube
+# PA1: Deferred shading
 
 # Dependencies, Building, and Running
 
@@ -25,7 +25,7 @@ The second option is to use the provided Makefile which is used as usual.
 Running the make in a separate directory will allow easy cleanup of the build data, and an easy way to prevent unnecessary data to be added to the git repository.  
 
 ### CMake Instructions
-The building of the project is done using CMake, installation with apt-get or brew may be necessary. Later use with CMake and Shader files will be require the copy of a directory where those files are stored (ex. shaders). To do this in the ```add_custom_target``` function place 
+The building of the project is done using CMake, installation with apt-get or brew may be necessary. Later use with CMake and Shader files will be require the copy of a directory where those files are stored (ex. shaders). To do this in the ```add_custom_target``` function place
 ```cmake
 COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/shaders/ ${CMAKE_CURRENT_BINARY_DIR}/shaders
 ```
@@ -38,7 +38,7 @@ make
 ./Tutorial
 ```
 
-### Makefile Instructions 
+### Makefile Instructions
 The makefile works as expected and must be updated with new files added in.
 
 ```bash

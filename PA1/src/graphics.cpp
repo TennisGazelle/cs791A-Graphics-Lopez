@@ -1,17 +1,14 @@
 #include "graphics.h"
 
-Graphics::Graphics()
-{
+Graphics::Graphics() {
 
 }
 
-Graphics::~Graphics()
-{
+Graphics::~Graphics() {
 
 }
 
-bool Graphics::Initialize(int width, int height)
-{
+bool Graphics::Initialize(int width, int height) {
   // Used for the linux OS
   #if !defined(__APPLE__) && !defined(MACOSX)
     // cout << glewGetString(GLEW_VERSION) << endl;
@@ -24,8 +21,7 @@ bool Graphics::Initialize(int width, int height)
     glGetError();
 
     //Check for error
-    if (status != GLEW_OK)
-    {
+    if (status != GLEW_OK) {
       std::cerr << "GLEW Error: " << glewGetErrorString(status) << "\n";
       return false;
     }
@@ -38,8 +34,7 @@ bool Graphics::Initialize(int width, int height)
 
   // Init Camera
   m_camera = new Camera();
-  if(!m_camera->Initialize(width, height))
-  {
+  if(!m_camera->Initialize(width, height)) {
     printf("Camera Failed to Initialize\n");
     return false;
   }
@@ -53,54 +48,54 @@ bool Graphics::Initialize(int width, int height)
 
   // Set up the shaders
   m_shader = new Shader();
-  if(!m_shader->Initialize())
-  {
+  if(!m_shader->Initialize()) {
     printf("Shader Failed to Initialize\n");
     return false;
   }
 
   // Add the vertex shader
-  if(!m_shader->LoadShader(GL_VERTEX_SHADER, "../shaders/pass_through_vertex.glsl"))
-  {
+  if(!m_shader->LoadShader(GL_VERTEX_SHADER, "../shaders/pass_through_vertex.glsl")) {
     printf("Vertex Shader failed to Initialize\n");
     return false;
   }
 
   // Add the fragment shader
-  if(!m_shader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/pass_through_fragment.glsl"))
-  {
+  if(!m_shader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/pass_through_fragment.glsl")) {
     printf("Fragment Shader failed to Initialize\n");
     return false;
   }
 
   // Connect the program
-  if(!m_shader->Finalize())
-  {
+  if(!m_shader->Finalize()) {
     printf("Program to Finalize\n");
     return false;
   }
 
   // Locate the projection matrix in the shader
   m_projectionMatrix = m_shader->GetUniformLocation("projectionMatrix");
-  if (m_projectionMatrix == INVALID_UNIFORM_LOCATION)
-  {
+  if (m_projectionMatrix == INVALID_UNIFORM_LOCATION) {
     printf("m_projectionMatrix not found\n");
     return false;
   }
 
   // Locate the view matrix in the shader
   m_viewMatrix = m_shader->GetUniformLocation("viewMatrix");
-  if (m_viewMatrix == INVALID_UNIFORM_LOCATION)
-  {
+  if (m_viewMatrix == INVALID_UNIFORM_LOCATION) {
     printf("m_viewMatrix not found\n");
     return false;
   }
 
   // Locate the model matrix in the shader
   m_modelMatrix = m_shader->GetUniformLocation("modelMatrix");
-  if (m_modelMatrix == INVALID_UNIFORM_LOCATION)
-  {
+  if (m_modelMatrix == INVALID_UNIFORM_LOCATION) {
     printf("m_modelMatrix not found\n");
+    return false;
+  }
+
+  // Locate the MVP matrix
+  m_mvpMatrix = m_shader->GetUniformLocation("mvpMatrix");
+  if (m_mvpMatrix == INVALID_UNIFORM_LOCATION) {
+    printf("m_mvpMatrix not found\n");
     return false;
   }
 
@@ -111,14 +106,12 @@ bool Graphics::Initialize(int width, int height)
   return true;
 }
 
-void Graphics::Update(unsigned int dt)
-{
+void Graphics::Update(unsigned int dt) {
   // Update the object
   m_cube->Update(dt);
 }
 
-void Graphics::Render()
-{
+void Graphics::Render() {
   //clear the screen
   glClearColor(0.0, 0.0, 0.2, 1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -132,45 +125,40 @@ void Graphics::Render()
 
   // Render the object
   glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_cube->GetModel()));
+  glUniformMatrix4fv(m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(
+    m_camera->GetProjection() * m_camera->GetView() * m_cube->GetModel()
+  ));
   m_cube->Render();
 
   // Get any errors from OpenGL
   auto error = glGetError();
-  if ( error != GL_NO_ERROR )
-  {
+  if ( error != GL_NO_ERROR ) {
     string val = ErrorString( error );
     std::cout<< "Error initializing OpenGL! " << error << ", " << val << std::endl;
   }
 }
 
-std::string Graphics::ErrorString(GLenum error)
-{
-  if(error == GL_INVALID_ENUM)
-  {
+std::string Graphics::ErrorString(GLenum error) {
+  if(error == GL_INVALID_ENUM) {
     return "GL_INVALID_ENUM: An unacceptable value is specified for an enumerated argument.";
   }
 
-  else if(error == GL_INVALID_VALUE)
-  {
+  else if(error == GL_INVALID_VALUE) {
     return "GL_INVALID_VALUE: A numeric argument is out of range.";
   }
 
-  else if(error == GL_INVALID_OPERATION)
-  {
+  else if(error == GL_INVALID_OPERATION) {
     return "GL_INVALID_OPERATION: The specified operation is not allowed in the current state.";
   }
 
-  else if(error == GL_INVALID_FRAMEBUFFER_OPERATION)
-  {
+  else if(error == GL_INVALID_FRAMEBUFFER_OPERATION) {
     return "GL_INVALID_FRAMEBUFFER_OPERATION: The framebuffer object is not complete.";
   }
 
-  else if(error == GL_OUT_OF_MEMORY)
-  {
+  else if(error == GL_OUT_OF_MEMORY) {
     return "GL_OUT_OF_MEMORY: There is not enough memory left to execute the command.";
   }
-  else
-  {
+  else {
     return "None";
   }
 }
