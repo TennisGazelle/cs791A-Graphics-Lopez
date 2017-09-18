@@ -3,12 +3,14 @@
 
 #include <iostream>
 #include <SDL2/SDL.h>
-using namespace std;
 
 #include "graphics_headers.h"
 #include "camera.h"
 #include "shader.h"
 #include "object.h"
+#include "shadow_map.h"
+
+using namespace std;
 
 class Graphics {
   public:
