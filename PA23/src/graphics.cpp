@@ -92,6 +92,13 @@ bool Graphics::Initialize(int width, int height) {
     return false;
   }
 
+  // Locate the MV matrix
+  m_mvMatrix = m_shader->GetUniformLocation("mvMatrix");
+  if (m_mvMatrix == INVALID_UNIFORM_LOCATION) {
+    printf("m_mvMatrix not found\n");
+    return false;
+  }
+
   // Locate the MVP matrix
   m_mvpMatrix = m_shader->GetUniformLocation("mvpMatrix");
   if (m_mvpMatrix == INVALID_UNIFORM_LOCATION) {
@@ -100,7 +107,7 @@ bool Graphics::Initialize(int width, int height) {
   }
 
   // Locate the light information
-  m_spotlight.position = glm::vec4(10, 10, 10, 0);
+  m_spotlight.position = glm::vec4(glm::vec3(5), 1);
   m_spotlight.diffuse = glm::vec4(1, 1, 1, 0);
   m_light = m_shader->GetUniformLocation("light");
   if (m_light == INVALID_UNIFORM_LOCATION) {
@@ -131,15 +138,18 @@ void Graphics::Render() {
   // send in the light information to the shader
   glUniform4fv(m_light, 1, glm::value_ptr(m_spotlight.position));
 
-  // Send in the projection and view to the shader
+  // Send in the projection aned view to the shader
   glUniformMatrix4fv(m_projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
   glUniformMatrix4fv(m_viewMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetView()));
 
   // Render the object
   glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_cube->GetModel()));
-  glUniformMatrix4fv(m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(
-    m_camera->GetProjection() * m_camera->GetView() * m_cube->GetModel()
-  ));
+
+  glm::mat4 matrix = m_camera->GetView() * m_cube->GetModel();
+  glUniformMatrix4fv(m_mvMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
+
+  matrix = m_camera->GetProjection() * matrix;
+  glUniformMatrix4fv(m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
   m_cube->Render();
 
   // Get any errors from OpenGL

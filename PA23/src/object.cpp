@@ -50,9 +50,11 @@ bool Object::LoadVerticiesFromFile(const std::string& filename) {
         //get position
         for (int j = 0; j < 3; j++) {
           tempVert.position[j] = aiScene->mMeshes[meshIndex]->mVertices[vertexIndex][j];
-          tempVert.color[j] =  float(rand()%100) / 100.0f;
+          //tempVert.color[j] =  float(rand()%100) / 100.0f;
+          tempVert.color[j] = 0;
           tempVert.normal[j] = aiScene->mMeshes[meshIndex]->mNormals[vertexIndex][j];
         }
+        tempVert.color[0] = 1;
 
         //add to the final vec
         vertices.push_back(tempVert);
@@ -75,10 +77,12 @@ glm::mat4 Object::GetModel() {
 void Object::Render() {
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
+  glEnableVertexAttribArray(2);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex,color));
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex,normal));
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
@@ -86,4 +90,5 @@ void Object::Render() {
 
   glDisableVertexAttribArray(0);
   glDisableVertexAttribArray(1);
+  glDisableVertexAttribArray(2);
 }

@@ -26,6 +26,7 @@ class Graphics {
     GLint m_projectionMatrix;
     GLint m_viewMatrix;
     GLint m_modelMatrix;
+    GLint m_mvMatrix;
     GLint m_mvpMatrix;
     GLint m_light;
 

@@ -26,9 +26,9 @@ public:
 
     glm::mat4 GetModel();
 
+    std::vector<Vertex> vertices;
 private:
     glm::mat4 model;
-    std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
     GLuint VBO;
     GLuint IBO;
