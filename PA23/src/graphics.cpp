@@ -122,6 +122,24 @@ bool Graphics::Initialize(int width, int height) {
   return true;
 }
 
+void Graphics::Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyPressed) {
+  switch(keycode) {
+    case SDLK_UP:
+      m_camera->moveForward_relative();
+      break;
+    case SDLK_DOWN:
+      m_camera->moveBackward_relative();
+      break;
+    case SDLK_LEFT:
+      shiftKeyPressed ? m_camera->pivotLeft_aroundFocus() : m_camera->moveLeft_relative();
+      break;
+    case SDLK_RIGHT:
+      shiftKeyPressed ? m_camera->pivotRight_aroundFocus() : m_camera->moveRight_relative();
+    default:
+      break;
+  }
+}
+
 void Graphics::Update(unsigned int dt) {
   // Update the object
   m_cube->Update(dt);

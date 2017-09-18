@@ -7,8 +7,7 @@
 #include "window.h"
 #include "graphics.h"
 
-class Engine
-{
+class Engine {
   public:
     Engine(string name, int width, int height);
     Engine(string name);
@@ -16,8 +15,9 @@ class Engine
     bool Initialize();
     void Run();
     void Keyboard();
-    unsigned int getDT();
+    long long getDT();
     long long GetCurrentTimeMillis();
+    long long GetCurrentTimeMicros();
   
   private:
     // Window related variables
@@ -29,7 +29,7 @@ class Engine
     SDL_Event m_event;
 
     Graphics *m_graphics;
-    unsigned int m_DT;
+    long long m_DT;
     long long m_currentTimeMillis;
     bool m_running;
 };

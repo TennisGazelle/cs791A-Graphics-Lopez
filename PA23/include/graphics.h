@@ -2,6 +2,7 @@
 #define GRAPHICS_H
 
 #include <iostream>
+#include <SDL2/SDL.h>
 using namespace std;
 
 #include "graphics_headers.h"
@@ -16,6 +17,7 @@ class Graphics {
     bool Initialize(int width, int height);
     void Update(unsigned int dt);
     void Render();
+    void Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyPressed);
 
   private:
     std::string ErrorString(GLenum error);
