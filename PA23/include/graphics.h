@@ -19,6 +19,8 @@ class Graphics {
     bool Initialize(int width, int height);
     void Update(unsigned int dt);
     void Render();
+    void ShadowMapPass();
+    void RenderPass();
     void Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyPressed);
 
   private:
@@ -26,6 +28,7 @@ class Graphics {
 
     Camera *m_camera;
     Shader *m_shader;
+    ShadowMap *m_shadowMap;
 
     GLint m_projectionMatrix;
     GLint m_viewMatrix;

@@ -15,6 +15,6 @@ public:
 private:
     GLuint m_fbo;
     GLuint m_shadowMap;
-}
+};
 
 #endif // __SHADOW_MAP_H_

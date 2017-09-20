@@ -32,6 +32,13 @@ bool Graphics::Initialize(int width, int height) {
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
 
+  // init shadow mapping
+  m_shadowMap = new ShadowMap();
+  if (!m_shadowMap->Init(width, height)) {
+    printf("Shadow Map FBO failed to init\n");
+    return false;
+  }
+  
   // Init Camera
   m_camera = new Camera();
   if(!m_camera->Initialize(width, height)) {
@@ -114,6 +121,7 @@ bool Graphics::Initialize(int width, int height) {
     printf("m_light not found\n");
     return false;
   }
+
 
   //enable depth testing
   glEnable(GL_DEPTH_TEST);

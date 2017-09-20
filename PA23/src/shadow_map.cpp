@@ -45,7 +45,7 @@ bool ShadowMap::Init(unsigned int w, unsigned int h) {
     // init error checking
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
-        printf("FrameBufferObject failed to init");
+        printf("FrameBufferObject failed to init\n");
         return false;
     }
 
