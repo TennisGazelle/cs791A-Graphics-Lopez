@@ -13,7 +13,7 @@ ShadowMap::~ShadowMap() {
         glDeleteFramebuffers(1, &m_fbo);
     }
     if (m_shadowMap != 0) {
-        glDeleteFramebuffers(1, &m_shadowMap);
+        glDeleteTextures(1, &m_shadowMap);
     }
 }
 

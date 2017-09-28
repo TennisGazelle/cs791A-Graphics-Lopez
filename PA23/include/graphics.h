@@ -36,8 +36,10 @@ class Graphics {
     GLint m_mvMatrix;
     GLint m_mvpMatrix;
     GLint m_light;
+    GLint m_gShadowMap;
 
     Object *m_cube;
+    Object *m_floor;
 
     Light m_spotlight;
 };

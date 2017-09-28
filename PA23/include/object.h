@@ -14,6 +14,7 @@
 #include <fstream>
 #include <string>
 using namespace Assimp;
+using namespace std;
 
 class Object {
 public:
@@ -27,8 +28,8 @@ public:
     glm::mat4 GetModel();
 
     std::vector<Vertex> vertices;
-private:
     glm::mat4 model;
+private:
     std::vector<unsigned int> indices;
     GLuint VBO;
     GLuint IBO;

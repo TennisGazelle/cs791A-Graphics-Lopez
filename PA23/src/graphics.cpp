@@ -38,20 +38,26 @@ bool Graphics::Initialize(int width, int height) {
     printf("Shadow Map FBO failed to init\n");
     return false;
   }
-  
+
   // Init Camera
   m_camera = new Camera();
   if(!m_camera->Initialize(width, height)) {
     printf("Camera Failed to Initialize\n");
     return false;
   }
-
+  
   // Create the object
   m_cube = new Object();
+  m_floor = new Object();
   if (!m_cube->Init("../meshes/Torus Knot.obj")) {
     printf("Object failed to init\n");
     return false;
   }
+  if (!m_floor->Init("../meshes/plane.obj")) {
+    printf("floor failed to init\n");
+    return false;
+  }
+  m_floor->model = glm::scale(glm::mat4(1.0), glm::vec3(5.0));
 
   // Set up the shaders
   m_shader = new Shader();
@@ -61,13 +67,13 @@ bool Graphics::Initialize(int width, int height) {
   }
 
   // Add the vertex shader
-  if(!m_shader->LoadShader(GL_VERTEX_SHADER, "../shaders/simple_lighting_vertex.glsl")) {
+  if(!m_shader->LoadShader(GL_VERTEX_SHADER, "../shaders/shadow_map_vertex.glsl")) {
     printf("Vertex Shader failed to Initialize\n");
     return false;
   }
 
   // Add the fragment shader
-  if(!m_shader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/simple_lighting_fragment.glsl")) {
+  if(!m_shader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/shadow_map_fragment.glsl")) {
     printf("Fragment Shader failed to Initialize\n");
     return false;
   }
@@ -114,13 +120,22 @@ bool Graphics::Initialize(int width, int height) {
   }
 
   // Locate the light information
-  m_spotlight.position = glm::vec4(glm::vec3(5), 1);
+  m_spotlight.position = glm::vec4(glm::vec3(10), 0);
   m_spotlight.diffuse = glm::vec4(1, 1, 1, 0);
+
   m_light = m_shader->GetUniformLocation("light");
   if (m_light == INVALID_UNIFORM_LOCATION) {
     printf("m_light not found\n");
     return false;
   }
+  m_gShadowMap = m_shader->GetUniformLocation("gShadowMap");
+  if (m_gShadowMap == INVALID_UNIFORM_LOCATION) {
+    printf("shadow map not found\n");
+    return false;
+  }
+
+  // enabled the shader
+  m_shader->Enable();
 
 
   //enable depth testing
@@ -154,35 +169,71 @@ void Graphics::Update(unsigned int dt) {
 }
 
 void Graphics::Render() {
-  //clear the screen
-  glClearColor(0.0, 0.0, 0.2, 1.0);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  ShadowMapPass();
+  RenderPass();
+}
 
-  // Start the correct program
-  m_shader->Enable();
+void Graphics::ShadowMapPass() {
+  m_shadowMap->bindForWriting();
+
+  glClear(GL_DEPTH_BUFFER_BIT);
 
   // send in the light information to the shader
   glUniform4fv(m_light, 1, glm::value_ptr(m_spotlight.position));
+  // Send in the projection and view to the shader
+  glUniformMatrix4fv(m_projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
+
+  glm::mat4 viewFromLight = glm::lookAt(glm::vec3(m_spotlight.position), m_spotlight.direction, glm::vec3(0.0, 1.0, 0.0));
+  glUniformMatrix4fv(m_viewMatrix, 1, GL_FALSE, glm::value_ptr(viewFromLight));
+
+  // pass in the cube
+  glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_cube->GetModel()));
+
+  glm::mat4 matrix = viewFromLight * m_cube->GetModel();
+  glUniformMatrix4fv(m_mvMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
+  matrix = m_camera->GetProjection() * matrix;
+  glUniformMatrix4fv(m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
+  m_cube->Render();
+  
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  
+  auto error = glGetError();
+  if ( error != GL_NO_ERROR ) {
+    string val = ErrorString( error );
+    std::cout<< "[Shadow Pass] - Error initializing OpenGL! " << error << ", " << val << std::endl;
+  }
+}
+
+void Graphics::RenderPass() {
+  //clear the screen
+  glClearColor(0.0, 0.0, 0.5, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  // set the texture unit
+  glUniform1i(m_gShadowMap, 0);
+  // bind the shadow map
+  m_shadowMap->bindForReading(GL_TEXTURE0);
+
+  // send in the light information to the shader
+  //glUniform4fv(m_light, 1, glm::value_ptr(m_spotlight.position));
 
   // Send in the projection aned view to the shader
   glUniformMatrix4fv(m_projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
   glUniformMatrix4fv(m_viewMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetView()));
 
   // Render the object
-  glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_cube->GetModel()));
-
-  glm::mat4 matrix = m_camera->GetView() * m_cube->GetModel();
+  glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_floor->GetModel()));
+  glm::mat4 matrix = m_camera->GetView() * m_floor->GetModel();
   glUniformMatrix4fv(m_mvMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
-
   matrix = m_camera->GetProjection() * matrix;
   glUniformMatrix4fv(m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
-  m_cube->Render();
+  m_floor->Render();
 
   // Get any errors from OpenGL
   auto error = glGetError();
   if ( error != GL_NO_ERROR ) {
     string val = ErrorString( error );
-    std::cout<< "Error initializing OpenGL! " << error << ", " << val << std::endl;
+    std::cout<< "[Render Pass] - Error initializing OpenGL! " << error << ", " << val << std::endl;
   }
 }
 

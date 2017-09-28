@@ -26,12 +26,14 @@ struct Vertex {
   glm::vec3 position;
   glm::vec3 color;
   glm::vec3 normal;
+  glm::vec2 texCoord;
 
-  Vertex(glm::vec3 v, glm::vec3 c, glm::vec3 n): position(v), color(c), normal(n) {}
+  Vertex(glm::vec3 v, glm::vec3 c, glm::vec3 n, glm::vec2 t): position(v), color(c), normal(n), texCoord(t) {}
 };
 
 struct Light {
   glm::vec4 position;
+  glm::vec3 direction;
   glm::vec4 diffuse;
 };
 
