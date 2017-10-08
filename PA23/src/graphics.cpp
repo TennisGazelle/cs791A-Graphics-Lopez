@@ -39,13 +39,20 @@ bool Graphics::Initialize(int width, int height) {
     return false;
   }
 
+  // init the lighting
+  m_lighting = new Lighting();
+  if (!m_lighting->Init()) {
+    printf("Lighting technique failed to init\n");
+    return false;
+  }
+
   // Init Camera
   m_camera = new Camera();
   if(!m_camera->Initialize(width, height)) {
     printf("Camera Failed to Initialize\n");
     return false;
   }
-  
+
   // Create the object
   m_cube = new Object();
   m_floor = new Object();
@@ -60,61 +67,60 @@ bool Graphics::Initialize(int width, int height) {
   m_floor->model = glm::scale(glm::mat4(1.0), glm::vec3(5.0));
 
   // Set up the shaders
-  m_shader = new Shader();
-  if(!m_shader->Initialize()) {
+  m_shadowMapShader = new Shader();
+  m_lightingShader = new Shader();
+  if(!m_shadowMapShader->Initialize()|| !m_lightingShader->Initialize()) {
     printf("Shader Failed to Initialize\n");
     return false;
   }
 
   // Add the vertex shader
-  if(!m_shader->LoadShader(GL_VERTEX_SHADER, "../shaders/shadow_map_vertex.glsl")) {
+  if(!m_shadowMapShader->LoadShader(GL_VERTEX_SHADER, "../shaders/shadow_map_vertex.glsl")) {
     printf("Vertex Shader failed to Initialize\n");
     return false;
   }
-
+  // TODO add the vertex shader for lighting
   // Add the fragment shader
-  if(!m_shader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/shadow_map_fragment.glsl")) {
+  if(!m_shadowMapShader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/shadow_map_fragment.glsl")) {
     printf("Fragment Shader failed to Initialize\n");
     return false;
   }
+  // TODO add the fragment shader for lighting
 
   // Connect the program
-  if(!m_shader->Finalize()) {
+  if(!m_shadowMapShader->Finalize()) {
     printf("Program to Finalize\n");
     return false;
   }
+  // TODO finalize the program for lighting shader as well
 
   // Locate the projection matrix in the shader
-  m_projectionMatrix = m_shader->GetUniformLocation("projectionMatrix");
-  if (m_projectionMatrix == INVALID_UNIFORM_LOCATION) {
-    printf("m_projectionMatrix not found\n");
+  m_shadowMapShaderInfo.m_projectionMatrix = m_shadowMapShader->GetUniformLocation("projectionMatrix");
+  if (m_shadowMapShaderInfo.m_projectionMatrix == INVALID_UNIFORM_LOCATION) {
+    printf("m_shadowMapShaderInfo.m_projectionMatrix not found\n");
     return false;
   }
-
   // Locate the view matrix in the shader
-  m_viewMatrix = m_shader->GetUniformLocation("viewMatrix");
-  if (m_viewMatrix == INVALID_UNIFORM_LOCATION) {
+  m_shadowMapShaderInfo.m_viewMatrix = m_shadowMapShader->GetUniformLocation("viewMatrix");
+  if (m_shadowMapShaderInfo.m_viewMatrix == INVALID_UNIFORM_LOCATION) {
     printf("m_viewMatrix not found\n");
     return false;
   }
-
   // Locate the model matrix in the shader
-  m_modelMatrix = m_shader->GetUniformLocation("modelMatrix");
-  if (m_modelMatrix == INVALID_UNIFORM_LOCATION) {
+  m_shadowMapShaderInfo.m_modelMatrix = m_shadowMapShader->GetUniformLocation("modelMatrix");
+  if (m_shadowMapShaderInfo.m_modelMatrix == INVALID_UNIFORM_LOCATION) {
     printf("m_modelMatrix not found\n");
     return false;
   }
-
   // Locate the MV matrix
-  m_mvMatrix = m_shader->GetUniformLocation("mvMatrix");
-  if (m_mvMatrix == INVALID_UNIFORM_LOCATION) {
+  m_shadowMapShaderInfo.m_mvMatrix = m_shadowMapShader->GetUniformLocation("mvMatrix");
+  if (m_shadowMapShaderInfo.m_mvMatrix == INVALID_UNIFORM_LOCATION) {
     printf("m_mvMatrix not found\n");
     return false;
   }
-
   // Locate the MVP matrix
-  m_mvpMatrix = m_shader->GetUniformLocation("mvpMatrix");
-  if (m_mvpMatrix == INVALID_UNIFORM_LOCATION) {
+  m_shadowMapShaderInfo.m_mvpMatrix = m_shadowMapShader->GetUniformLocation("mvpMatrix");
+  if (m_shadowMapShaderInfo.m_mvpMatrix == INVALID_UNIFORM_LOCATION) {
     printf("m_mvpMatrix not found\n");
     return false;
   }
@@ -123,19 +129,19 @@ bool Graphics::Initialize(int width, int height) {
   m_spotlight.position = glm::vec4(glm::vec3(10), 0);
   m_spotlight.diffuse = glm::vec4(1, 1, 1, 0);
 
-  m_light = m_shader->GetUniformLocation("light");
+  m_light = m_shadowMapShader->GetUniformLocation("light");
   if (m_light == INVALID_UNIFORM_LOCATION) {
     printf("m_light not found\n");
     return false;
   }
-  m_gShadowMap = m_shader->GetUniformLocation("gShadowMap");
+  m_gShadowMap = m_shadowMapShader->GetUniformLocation("gShadowMap");
   if (m_gShadowMap == INVALID_UNIFORM_LOCATION) {
     printf("shadow map not found\n");
     return false;
   }
 
   // enabled the shader
-  m_shader->Enable();
+  m_shadowMapShader->Enable();
 
 
   //enable depth testing
@@ -181,22 +187,22 @@ void Graphics::ShadowMapPass() {
   // send in the light information to the shader
   glUniform4fv(m_light, 1, glm::value_ptr(m_spotlight.position));
   // Send in the projection and view to the shader
-  glUniformMatrix4fv(m_projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
+  glUniformMatrix4fv(m_shadowMapShaderInfo.m_projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
 
   glm::mat4 viewFromLight = glm::lookAt(glm::vec3(m_spotlight.position), m_spotlight.direction, glm::vec3(0.0, 1.0, 0.0));
-  glUniformMatrix4fv(m_viewMatrix, 1, GL_FALSE, glm::value_ptr(viewFromLight));
+  glUniformMatrix4fv(m_shadowMapShaderInfo.m_viewMatrix, 1, GL_FALSE, glm::value_ptr(viewFromLight));
 
   // pass in the cube
-  glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_cube->GetModel()));
+  glUniformMatrix4fv(m_shadowMapShaderInfo.m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_cube->GetModel()));
 
   glm::mat4 matrix = viewFromLight * m_cube->GetModel();
-  glUniformMatrix4fv(m_mvMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
+  glUniformMatrix4fv(m_shadowMapShaderInfo.m_mvMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
   matrix = m_camera->GetProjection() * matrix;
-  glUniformMatrix4fv(m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
+  glUniformMatrix4fv(m_shadowMapShaderInfo.m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
   m_cube->Render();
-  
+
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  
+
   auto error = glGetError();
   if ( error != GL_NO_ERROR ) {
     string val = ErrorString( error );
@@ -218,15 +224,15 @@ void Graphics::RenderPass() {
   //glUniform4fv(m_light, 1, glm::value_ptr(m_spotlight.position));
 
   // Send in the projection aned view to the shader
-  glUniformMatrix4fv(m_projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
+  glUniformMatrix4fv(m_shadowMapShaderInfo.m_projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
   glUniformMatrix4fv(m_viewMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetView()));
 
   // Render the object
-  glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_floor->GetModel()));
+  glUniformMatrix4fv(m_shadowMapShaderInfo.m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_floor->GetModel()));
   glm::mat4 matrix = m_camera->GetView() * m_floor->GetModel();
-  glUniformMatrix4fv(m_mvMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
+  glUniformMatrix4fv(m_shadowMapShaderInfo.m_mvMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
   matrix = m_camera->GetProjection() * matrix;
-  glUniformMatrix4fv(m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
+  glUniformMatrix4fv(m_shadowMapShaderInfo.m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
   m_floor->Render();
 
   // Get any errors from OpenGL
