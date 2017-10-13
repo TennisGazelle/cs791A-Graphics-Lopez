@@ -8,6 +8,8 @@ Lighting::Lighting() {
 }
 
 bool Lighting::Init() {
+  // init the other shaders
+
   return true;
 }
 

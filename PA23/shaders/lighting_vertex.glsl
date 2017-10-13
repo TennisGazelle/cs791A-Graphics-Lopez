@@ -6,7 +6,7 @@ layout (location = 2) in vec3 v_normal;
 
 uniform mat4 gMVP;
 uniform mat4 gLightMVP;
-uniform mat4 gWorld;
+uniform mat4 gModel;
 
 out vec4 lightPosInWorld;
 
@@ -18,7 +18,8 @@ void main() {
   gl_Position = gMVP * vec4(v_pos, 1.0);
 
   lightPosInWorld = gLightMVP * vec4(v_pos, 1.0);
-  pos0 = (gWorld * vec4(v_pos, 1.0)).xyz;
+
+  pos0 = (gModel * vec4(v_pos, 1.0)).xyz;
   texCoord0 = v_tex_coord;
-  normal0 = (gWorld * vec4(v_normal, 0.0)).xyz;
+  normal0 = (gModel * vec4(v_normal, 0.0)).xyz;
 }

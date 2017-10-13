@@ -4,17 +4,17 @@ struct BaseLight {
   vec3 color;
   float ambientIntensity;
   float diffuseIntensity;
-}
+};
 
 struct Attenuation {
   float constant, linear, exp;
-}
+};
 
 struct PointLight {
   BaseLight base;
   Attenuation atten;
   vec3 position;
-}
+};
 
 // Fragment Shader out
 out vec4 FragColor;
@@ -30,7 +30,8 @@ in vec3 normal0;
 uniform sampler2D gSampler;
 uniform sampler2D gShadowMap;
 uniform vec3 gEyeWorldPos;
-uniform float gMatSpeculatIntensity;
+uniform float gMatSpeculatIntensity = 0.5;
+uniform PointLight pointLight;
 
 // calculate shadow factor of a pixel
   // multiply the result of our current light equation by this factor, and causes some attentuation of the lgiht in pixelsthat are determined to be shadows
@@ -45,7 +46,7 @@ float calcShadowFactor(vec4 lightSpacePos) {
   );
   float z = 0.5 * projCoords.z + 0.5;
 
-  float depth = texture(gShadowMap, UVCoords).x;
+  float depth = texture(gShadowMap, uvCoords).x;
   if (depth < z + 0.00001)
     return 0.5;
   else
@@ -75,5 +76,6 @@ vec4 calcLightGeneric(BaseLight light, vec3 lightDir, vec3 normal, float shadowF
 }
 
 void main() {
+    vec3 n = normalize(normal0);
 
 }

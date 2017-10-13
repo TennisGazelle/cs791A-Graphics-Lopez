@@ -18,6 +18,7 @@ class Graphics {
     Graphics();
     ~Graphics();
     bool Initialize(int width, int height);
+    bool ShaderLinking();
     void Update(unsigned int dt);
     void Render();
     void ShadowMapPass();
@@ -35,21 +36,31 @@ class Graphics {
       GLint m_modelMatrix;
       GLint m_mvMatrix;
       GLint m_mvpMatrix;
+      GLint m_light;
+      GLint m_gShadowMap;
+    };
+    struct ShadowMapShaderLocInfo : ShaderLocInfo {};
+    struct LightingShaderLocInfo : ShaderLocInfo {
+        GLint m_lightMVPMatrix; // gLightMVP
+        GLint m_sampler;        // gSampler
+        GLint m_eyeWorldPos;    // gEyeWorldPos
+        GLint m_pointLight_color;
+        GLint m_pointLight_ambientIntensity;
+        GLint m_pointLight_diffuseIntensity;
+        GLint m_pointLight_position;
     };
 
     // shadow map information and shading
     Shader *m_shadowMapShader;
     ShadowMap *m_shadowMap;
-    ShaderLocInfo m_shadowMapShaderInfo;
+    ShadowMapShaderLocInfo m_shadowMapShaderInfo;
 
     // lighting information and shading
     Shader *m_lightingShader;
     Lighting *m_lighting;
-    ShaderLocInfo m_lightingShaderInfo;
+    LightingShaderLocInfo m_lightingShaderInfo;
 
     Light m_spotlight;
-    GLint m_light;
-    GLint m_gShadowMap;
 
     Object *m_cube;
     Object *m_floor;
