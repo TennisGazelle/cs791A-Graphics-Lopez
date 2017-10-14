@@ -41,8 +41,13 @@ bool Graphics::Initialize(int width, int height) {
 
   // Create the object
   m_cube = new Object();
+  m_floor = new Object();
   if (!m_cube->Init("../meshes/Torus Knot.obj")) {
     printf("Object failed to init\n");
+    return false;
+  }
+  if (!m_floor->Init("../meshes/plane.obj", "../textures/stone_floor.jpg")) {
+    printf("floor failed to init\n");
     return false;
   }
 
@@ -161,14 +166,20 @@ void Graphics::Render() {
   glUniformMatrix4fv(m_viewMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetView()));
 
   // Render the object
-  glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_cube->GetModel()));
-
   glm::mat4 matrix = m_camera->GetView() * m_cube->GetModel();
+  glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_cube->GetModel()));
   glUniformMatrix4fv(m_mvMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
-
   matrix = m_camera->GetProjection() * matrix;
   glUniformMatrix4fv(m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
   m_cube->Render();
+
+  // Render the object
+  matrix = m_camera->GetView() * m_cube->GetModel();
+  glUniformMatrix4fv(m_modelMatrix, 1, GL_FALSE, glm::value_ptr(m_floor->GetModel()));  
+  glUniformMatrix4fv(m_mvMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
+  matrix = m_camera->GetProjection() * matrix;
+  glUniformMatrix4fv(m_mvpMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
+  m_floor->Render();
 
   // Get any errors from OpenGL
   auto error = glGetError();

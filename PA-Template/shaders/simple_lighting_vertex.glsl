@@ -2,8 +2,10 @@
 layout (location = 0) in vec3 v_position;
 layout (location = 1) in vec3 v_color;
 layout (location = 2) in vec3 v_normal;
+layout (location = 3) in vec2 v_uv;
 
 smooth out vec3 color;
+smooth out vec2 uv;
 
 smooth out vec3 vPosInWorld;
 smooth out vec3 vNormInWorld;
@@ -33,4 +35,5 @@ void main(void) {
 
 	gl_Position = (mvpMatrix) * vec4(v_position, 1.0);
 	color = v_color;
+	uv = v_uv;
 }

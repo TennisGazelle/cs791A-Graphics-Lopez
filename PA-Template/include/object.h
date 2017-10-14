@@ -10,6 +10,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/color4.h>
 #include <glm/gtx/vector_angle.hpp>
+#include <Magick++.h>
 
 #include <fstream>
 #include <string>
@@ -20,9 +21,11 @@ public:
     Object();
     ~Object();
     bool Init(const std::string& filename);
+    bool Init(const std::string& objFilename, const std::string& textureFilename);
     void Update(unsigned int dt);
     void Render();
     bool LoadVerticiesFromFile(const std::string& filename);
+    bool LoadTextureData(const std::string& filename);
 
     glm::mat4 GetModel();
 
@@ -32,6 +35,11 @@ private:
     std::vector<unsigned int> indices;
     GLuint VBO;
     GLuint IBO;
+    
+    GLuint TBO;
+    Magick::Blob blob;
+    unsigned int m_texture_width, m_texture_height;
+
 };
 
 #endif /* OBJECT_H */
