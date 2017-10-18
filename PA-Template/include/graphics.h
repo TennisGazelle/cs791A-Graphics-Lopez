@@ -33,6 +33,7 @@ class Graphics {
     GLint m_light;
 
     Object *m_cube;
+    Object *m_floor;
 
     Light m_spotlight;
 };

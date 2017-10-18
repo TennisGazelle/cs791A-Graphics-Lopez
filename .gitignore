@@ -30,4 +30,6 @@
 *.out
 *.app
 
-PA*/build
+# Building directories
+PA*/*build*
+*/.idea/*

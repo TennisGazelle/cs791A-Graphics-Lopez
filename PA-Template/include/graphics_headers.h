@@ -26,8 +26,8 @@ struct Vertex {
   glm::vec3 position;
   glm::vec3 color;
   glm::vec3 normal;
-
-  Vertex(glm::vec3 v, glm::vec3 c, glm::vec3 n): position(v), color(c), normal(n) {}
+  glm::vec2 uv;
+  Vertex(glm::vec3 v, glm::vec3 c, glm::vec3 n, glm::vec2 u): position(v), color(c), normal(n), uv(u) {}
 };
 
 struct Light {
