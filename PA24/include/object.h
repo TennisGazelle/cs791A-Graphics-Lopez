@@ -10,7 +10,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/color4.h>
 #include <glm/gtx/vector_angle.hpp>
-#include <ImageMagick-7/Magick++.h>
+#include <Magick++.h>
 
 #include <fstream>
 #include <string>

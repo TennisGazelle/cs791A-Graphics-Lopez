@@ -51,7 +51,7 @@ bool Graphics::Initialize(int width, int height) {
         printf("floor failed to init\n");
         return false;
     }
-    m_cube->setModel(glm::translate(glm::vec3(0, 5, 0)));
+    m_cube->setModel(glm::translate(glm::vec3(0, 2.5f, 0)));
 
     // Set up the shaders
     m_shader = new LightingShader();
@@ -112,7 +112,7 @@ bool Graphics::Initialize(int width, int height) {
     }
 
     // Locate the light information
-    m_spotlight.position = glm::vec4(glm::vec3(5), 1);
+    m_spotlight.position = glm::vec4(5, 2, 0, 1);
     m_spotlight.diffuse = glm::vec4(1, 1, 1, 0);
     m_spotlight.direction = glm::normalize(m_spotlight.position);
 
@@ -153,6 +153,14 @@ void Graphics::Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyP
             }
             break;
 
+        case SDLK_KP_2:
+            m_spotlight.direction.z += 0.25;
+            break;
+        case SDLK_KP_8:
+            m_spotlight.direction.z -= 0.25;
+            break;
+
+
         default:
             break;
     }
@@ -161,11 +169,16 @@ void Graphics::Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyP
 void Graphics::Update(unsigned int dt) {
     // Update the object
     m_cube->Update(dt);
+    // update the location of the light
+    static float angle = 0.01;
+    static glm::mat4 rotation = glm::translate(glm::vec3(10, 5, 0));
+    rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0, 1, 0)) *rotation;
+    m_spotlight.position = rotation[3];
 }
 
 void Graphics::Render() {
     ShadowRenderPass();
-//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
     LightingRenderPass();
 }
 
@@ -179,7 +192,7 @@ void Graphics::ShadowRenderPass() {
     m_shadowMapShader->Enable();
 
     // make the view from the light
-    glm::mat4 viewFromLight = glm::lookAt(glm::vec3(m_spotlight.position), m_spotlight.direction, glm::vec3(0, 1, 0));
+    glm::mat4 viewFromLight = glm::lookAt(glm::vec3(m_spotlight.position), glm::vec3(m_spotlight.direction), glm::vec3(0, 1, 0));
 
     // send in light
     glUniformMatrix4fv(m_shadowMapShader->projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
@@ -195,7 +208,7 @@ void Graphics::ShadowRenderPass() {
 }
 
 void Graphics::LightingRenderPass() {
-//    m_shadowMapFBO->BindForReading(GL_TEXTURE1);
+    //m_shadowMapFBO->BindForReading(GL_TEXTURE1);
     //clear the screen
     glClearColor(0.0, 0.0, 0.2, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

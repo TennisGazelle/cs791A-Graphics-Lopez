@@ -86,7 +86,7 @@ bool Object::LoadVerticiesFromFile(const std::string &filename) {
                 }
 
                 if (aiScene->mMeshes[meshIndex]->mTextureCoords) {
-                    tempVert.uv[0] = 1 - aiScene->mMeshes[meshIndex]->mTextureCoords[0][vertexIndex][0];
+                    tempVert.uv[0] = aiScene->mMeshes[meshIndex]->mTextureCoords[0][vertexIndex][0];
                     tempVert.uv[1] = aiScene->mMeshes[meshIndex]->mTextureCoords[0][vertexIndex][1];
                 }
 
