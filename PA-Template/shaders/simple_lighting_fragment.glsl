@@ -1,6 +1,8 @@
 #version 330
 
 smooth in vec3 color;
+smooth in vec2 uv;
+
 smooth in vec3 vPosInWorld;
 smooth in vec3 vNormInWorld;
 smooth in vec3 vertToCam;
@@ -9,6 +11,7 @@ smooth in vec3 vertToLight;
 out vec4 frag_color;
 
 uniform vec4 light;
+uniform sampler2D gSampler;
 
 void main(void) {
   vec4 MatAmbientColor = vec4(0.1, 0.1, 0.1, 1.0);
@@ -19,6 +22,10 @@ void main(void) {
   // vec3 diffuseAlbedo = color;
   // float specPower = 2.0f;
   // vec3 ambient = vec3(0.1);
+
+  if (uv.x != -1) {
+    MatDiffuseColor = texture(gSampler, uv);
+  }
 
   vec3 n = normalize(vNormInWorld);
   vec3 l = normalize(vertToLight);
