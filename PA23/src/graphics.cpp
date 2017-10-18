@@ -9,8 +9,8 @@ Graphics::~Graphics() {
 }
 
 bool Graphics::Initialize(int width, int height) {
-  // Used for the linux OS
-  #if !defined(__APPLE__) && !defined(MACOSX)
+    // Used for the linux OS
+#if !defined(__APPLE__) && !defined(MACOSX)
     // cout << glewGetString(GLEW_VERSION) << endl;
     glewExperimental = GL_TRUE;
 
@@ -193,31 +193,31 @@ bool Graphics::ShaderLinking() {
 }
 
 void Graphics::Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyPressed) {
-  switch(keycode) {
-    case SDLK_UP:
-      m_camera->moveForward_relative();
-      break;
-    case SDLK_DOWN:
-      m_camera->moveBackward_relative();
-      break;
-    case SDLK_LEFT:
-      shiftKeyPressed ? m_camera->pivotLeft_aroundFocus() : m_camera->moveLeft_relative();
-      break;
-    case SDLK_RIGHT:
-      shiftKeyPressed ? m_camera->pivotRight_aroundFocus() : m_camera->moveRight_relative();
-    default:
-      break;
-  }
+    switch (keycode) {
+        case SDLK_UP:
+            m_camera->moveForward_relative();
+            break;
+        case SDLK_DOWN:
+            m_camera->moveBackward_relative();
+            break;
+        case SDLK_LEFT:
+            shiftKeyPressed ? m_camera->pivotLeft_aroundFocus() : m_camera->moveLeft_relative();
+            break;
+        case SDLK_RIGHT:
+            shiftKeyPressed ? m_camera->pivotRight_aroundFocus() : m_camera->moveRight_relative();
+        default:
+            break;
+    }
 }
 
 void Graphics::Update(unsigned int dt) {
-  // Update the object
-  m_cube->Update(dt);
+    // Update the object
+    m_cube->Update(dt);
 }
 
 void Graphics::Render() {
-  ShadowMapPass();
-  RenderPass();
+    ShadowMapPass();
+    RenderPass();
 }
 
 void Graphics::ShadowMapPass() {
@@ -294,26 +294,17 @@ void Graphics::RenderPass() {
 }
 
 std::string Graphics::ErrorString(GLenum error) {
-  if(error == GL_INVALID_ENUM) {
-    return "GL_INVALID_ENUM: An unacceptable value is specified for an enumerated argument.";
-  }
-
-  else if(error == GL_INVALID_VALUE) {
-    return "GL_INVALID_VALUE: A numeric argument is out of range.";
-  }
-
-  else if(error == GL_INVALID_OPERATION) {
-    return "GL_INVALID_OPERATION: The specified operation is not allowed in the current state.";
-  }
-
-  else if(error == GL_INVALID_FRAMEBUFFER_OPERATION) {
-    return "GL_INVALID_FRAMEBUFFER_OPERATION: The framebuffer object is not complete.";
-  }
-
-  else if(error == GL_OUT_OF_MEMORY) {
-    return "GL_OUT_OF_MEMORY: There is not enough memory left to execute the command.";
-  }
-  else {
-    return "None";
-  }
+    if (error == GL_INVALID_ENUM) {
+        return "GL_INVALID_ENUM: An unacceptable value is specified for an enumerated argument.";
+    } else if (error == GL_INVALID_VALUE) {
+        return "GL_INVALID_VALUE: A numeric argument is out of range.";
+    } else if (error == GL_INVALID_OPERATION) {
+        return "GL_INVALID_OPERATION: The specified operation is not allowed in the current state.";
+    } else if (error == GL_INVALID_FRAMEBUFFER_OPERATION) {
+        return "GL_INVALID_FRAMEBUFFER_OPERATION: The framebuffer object is not complete.";
+    } else if (error == GL_OUT_OF_MEMORY) {
+        return "GL_OUT_OF_MEMORY: There is not enough memory left to execute the command.";
+    } else {
+        return "None";
+    }
 }

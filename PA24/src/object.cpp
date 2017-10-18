@@ -124,9 +124,10 @@ void Object::setModel(const glm::mat4 &incomingMatrix) {
 
 void Object::Render() {
     if (TBO != 0) {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, TBO);
     }
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, TBO);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
