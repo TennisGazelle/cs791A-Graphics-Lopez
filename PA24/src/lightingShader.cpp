@@ -45,17 +45,17 @@ bool LightingShader::LinkShaderProps() {
     return false;
   }
 
-  gShadowMap = GetUniformLocation("gShadowMap");
-  if (gShadowMap == INVALID_UNIFORM_LOCATION) {
-    printf("shadow map in light shader not found \n");
-    return false;
-  }
-
-  gSampler = GetUniformLocation("gSampler");
-  if(gSampler == INVALID_UNIFORM_LOCATION) {
-    printf("g Sampler in light shader not found\n");
-    return false;
-  }
+//  gShadowMap = GetUniformLocation("gShadowMap");
+//  if (gShadowMap == INVALID_UNIFORM_LOCATION) {
+//    printf("shadow map in light shader not found \n");
+//    return false;
+//  }
+//
+//  gSampler = GetUniformLocation("gSampler");
+//  if(gSampler == INVALID_UNIFORM_LOCATION) {
+//    printf("g Sampler in light shader not found\n");
+//    return false;
+//  }
   return true;
 }
 

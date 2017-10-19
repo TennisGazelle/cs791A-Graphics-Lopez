@@ -36,8 +36,8 @@ private:
     std::vector<unsigned int> indices;
     GLuint VBO;
     GLuint IBO;
-    
     GLuint TBO;
+
     Magick::Blob blob;
     unsigned int m_texture_width, m_texture_height;
 

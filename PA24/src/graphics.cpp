@@ -47,7 +47,7 @@ bool Graphics::Initialize(int width, int height) {
         printf("Object failed to init\n");
         return false;
     }
-    if (!m_floor->Init("../meshes/plane.obj", "../textures/stone_floor.jpg")) {
+    if (!m_floor->Init("../meshes/plane.obj")) {
         printf("floor failed to init\n");
         return false;
     }
@@ -78,38 +78,36 @@ bool Graphics::Initialize(int width, int height) {
         printf("Lighting shader didn't find some shaders\n");
         return false;
     }
-    // set the texture unit
-    glUniform1i(m_shader->gSampler, 0);
-    glUniform1i(m_shader->gShadowMap, 1);
 
-    m_shadowMapShader = new ShadowMapShader();
-    if (!m_shadowMapShader->Initialize()) {
-        printf("shadow map shader failed to init\n");
-        return false;
-    }
-    if (!m_shadowMapShader->LoadShader(GL_VERTEX_SHADER, "../shaders/shadow_map_vertex.glsl")) {
-        printf("shadow map vertex failed to init\n");
-        return false;
-    }
-    if (!m_shadowMapShader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/shadow_map_fragment.glsl")) {
-        printf("shadow map vertex shader failed to init\n");
-        return false;
-    }
-    if (!m_shadowMapShader->Finalize()) {
-        printf("shader failed to finalize\n");
-        return false;
-    }
-    if (!m_shadowMapShader->LinkShaderProps()) {
-        printf("Shadow shader didn't find some variables\n");
-        return false;
-    }
-
-    // create the frame buffer
-    m_shadowMapFBO = new ShadowMapFBO();
-    if (!m_shadowMapFBO->Init(width, height)) {
-        printf("error with init fbo\n");
-        return false;
-    }
+//
+//    m_shadowMapShader = new ShadowMapShader();
+//    if (!m_shadowMapShader->Initialize()) {
+//        printf("shadow map shader failed to init\n");
+//        return false;
+//    }
+//    if (!m_shadowMapShader->LoadShader(GL_VERTEX_SHADER, "../shaders/shadow_map_vertex.glsl")) {
+//        printf("shadow map vertex failed to init\n");
+//        return false;
+//    }
+//    if (!m_shadowMapShader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/shadow_map_fragment.glsl")) {
+//        printf("shadow map vertex shader failed to init\n");
+//        return false;
+//    }
+//    if (!m_shadowMapShader->Finalize()) {
+//        printf("shader failed to finalize\n");
+//        return false;
+//    }
+//    if (!m_shadowMapShader->LinkShaderProps()) {
+//        printf("Shadow shader didn't find some variables\n");
+//        return false;
+//    }
+//
+//    // create the frame buffer
+//    m_shadowMapFBO = new ShadowMapFBO();
+//    if (!m_shadowMapFBO->Init(width, height)) {
+//        printf("error with init fbo\n");
+//        return false;
+//    }
 
     // Locate the light information
     m_spotlight.position = glm::vec4(5, 2, 0, 1);
@@ -177,15 +175,14 @@ void Graphics::Update(unsigned int dt) {
 }
 
 void Graphics::Render() {
-    ShadowRenderPass();
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//    ShadowRenderPass();
+//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     LightingRenderPass();
 }
 
 void Graphics::ShadowRenderPass() {
     // clear the buffer
     m_shadowMapFBO->BindForWriting();
-    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_DEPTH_BUFFER_BIT);
 
     // set it up for writing
@@ -208,13 +205,17 @@ void Graphics::ShadowRenderPass() {
 }
 
 void Graphics::LightingRenderPass() {
-    //m_shadowMapFBO->BindForReading(GL_TEXTURE1);
+//    m_shadowMapFBO->BindForReading(GL_TEXTURE1);
     //clear the screen
     glClearColor(0.0, 0.0, 0.2, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Start the correct program
     m_shader->Enable();
+
+    // set the texture unit
+//    glUniform1i(m_shader->gSampler, 0);
+//    glUniform1i(m_shader->gShadowMap, 1);
 
     // send in the light information to the shader
     glUniform4fv(m_shader->light, 1, glm::value_ptr(m_spotlight.position));
@@ -244,7 +245,7 @@ void Graphics::LightingRenderPass() {
     auto error = glGetError();
     if (error != GL_NO_ERROR) {
         string val = ErrorString(error);
-//        std::cout << "Error initializing OpenGL! " << error << ", " << val << std::endl;
+        std::cout << "Error initializing OpenGL! " << error << ", " << val << std::endl;
     }
 }
 
