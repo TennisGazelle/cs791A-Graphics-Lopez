@@ -17,6 +17,7 @@ uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 uniform mat4 mvpMatrix;
+uniform mat4 lightViewMatrix;
 uniform vec4 light;
 
 void main(void) {
@@ -37,5 +38,5 @@ void main(void) {
 	gl_Position = (mvpMatrix) * vec4(v_position, 1.0);
 	color = v_color;
 	uv = v_uv;
-	lPosInWorld = light;
+	lPosInWorld = projectionMatrix * lightViewMatrix * modelMatrix * vec4(v_position, 1.0);
 }

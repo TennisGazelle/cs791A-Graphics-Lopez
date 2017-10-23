@@ -43,7 +43,7 @@ bool Graphics::Initialize(int width, int height) {
     // Create the object
     m_cube = new Object();
     m_floor = new Object();
-    if (!m_cube->Init("../meshes/Torus Knot.obj", "../textures/chrome_mercury.jpg")) {
+    if (!m_cube->Init("../meshes/Torus Knot.obj", "../textures/stone_floor.jpg")) {
         printf("Object failed to init\n");
         return false;
     }
@@ -79,35 +79,34 @@ bool Graphics::Initialize(int width, int height) {
         return false;
     }
 
-//
-//    m_shadowMapShader = new ShadowMapShader();
-//    if (!m_shadowMapShader->Initialize()) {
-//        printf("shadow map shader failed to init\n");
-//        return false;
-//    }
-//    if (!m_shadowMapShader->LoadShader(GL_VERTEX_SHADER, "../shaders/shadow_map_vertex.glsl")) {
-//        printf("shadow map vertex failed to init\n");
-//        return false;
-//    }
-//    if (!m_shadowMapShader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/shadow_map_fragment.glsl")) {
-//        printf("shadow map vertex shader failed to init\n");
-//        return false;
-//    }
-//    if (!m_shadowMapShader->Finalize()) {
-//        printf("shader failed to finalize\n");
-//        return false;
-//    }
-//    if (!m_shadowMapShader->LinkShaderProps()) {
-//        printf("Shadow shader didn't find some variables\n");
-//        return false;
-//    }
-//
-//    // create the frame buffer
-//    m_shadowMapFBO = new ShadowMapFBO();
-//    if (!m_shadowMapFBO->Init(width, height)) {
-//        printf("error with init fbo\n");
-//        return false;
-//    }
+    m_shadowMapShader = new ShadowMapShader();
+    if (!m_shadowMapShader->Initialize()) {
+        printf("shadow map shader failed to init\n");
+        return false;
+    }
+    if (!m_shadowMapShader->LoadShader(GL_VERTEX_SHADER, "../shaders/shadow_map_vertex.glsl")) {
+        printf("shadow map vertex failed to init\n");
+        return false;
+    }
+    if (!m_shadowMapShader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/shadow_map_fragment.glsl")) {
+        printf("shadow map vertex shader failed to init\n");
+        return false;
+    }
+    if (!m_shadowMapShader->Finalize()) {
+        printf("shader failed to finalize\n");
+        return false;
+    }
+    if (!m_shadowMapShader->LinkShaderProps()) {
+        printf("Shadow shader didn't find some variables\n");
+        return false;
+    }
+
+    // create the frame buffer
+    m_shadowMapFBO = new ShadowMapFBO();
+    if (!m_shadowMapFBO->Init(width, height)) {
+        printf("error with init fbo\n");
+        return false;
+    }
 
     // Locate the light information
     m_spotlight.position = glm::vec4(5, 2, 0, 1);
@@ -169,14 +168,13 @@ void Graphics::Update(unsigned int dt) {
     m_cube->Update(dt);
     // update the location of the light
     static float angle = 0.01;
-    static glm::mat4 rotation = glm::translate(glm::vec3(10, 5, 0));
+    static glm::mat4 rotation = glm::translate(glm::vec3(5, 5, 0));
     rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0, 1, 0)) *rotation;
     m_spotlight.position = rotation[3];
 }
 
 void Graphics::Render() {
-//    ShadowRenderPass();
-//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    ShadowRenderPass();
     LightingRenderPass();
 }
 
@@ -205,7 +203,7 @@ void Graphics::ShadowRenderPass() {
 }
 
 void Graphics::LightingRenderPass() {
-//    m_shadowMapFBO->BindForReading(GL_TEXTURE1);
+    m_shadowMapFBO->BindForReading(GL_TEXTURE1);
     //clear the screen
     glClearColor(0.0, 0.0, 0.2, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -214,16 +212,17 @@ void Graphics::LightingRenderPass() {
     m_shader->Enable();
 
     // set the texture unit
-//    glUniform1i(m_shader->gSampler, 0);
-//    glUniform1i(m_shader->gShadowMap, 1);
+    glUniform1i(m_shader->gSampler, 0);
+    glUniform1i(m_shader->gShadowMap, 1);
 
     // send in the light information to the shader
     glUniform4fv(m_shader->light, 1, glm::value_ptr(m_spotlight.position));
+    glm::mat4 viewFromLight = glm::lookAt(glm::vec3(m_spotlight.position), glm::vec3(m_spotlight.direction), glm::vec3(0, 1, 0));
 
     // Send in the projection aned view to the shader
     glUniformMatrix4fv(m_shader->projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
     glUniformMatrix4fv(m_shader->viewMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetView()));
-
+    glUniformMatrix4fv(m_shader->lightViewMatrix, 1, GL_FALSE, glm::value_ptr(viewFromLight));
     glm::mat4 matrix;
     // Render the cube object
     matrix = m_camera->GetView() * m_cube->GetModel();

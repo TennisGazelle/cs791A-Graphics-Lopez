@@ -46,10 +46,10 @@ bool Object::Init(const std::string &objFilename, const std::string &textureFile
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &TBO);
-//    glBindTexture(GL_TEXTURE_2D, TBO);
+    glBindTexture(GL_TEXTURE_2D, TBO);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_texture_width, m_texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_texture_width, m_texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE,
                  blob.data());
 
     return true;
@@ -124,10 +124,10 @@ void Object::setModel(const glm::mat4 &incomingMatrix) {
 
 void Object::Render() {
     if (TBO != 0) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, TBO);
     }
 
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, TBO);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
@@ -149,5 +149,5 @@ void Object::Render() {
     glDisableVertexAttribArray(2);
     glDisableVertexAttribArray(3);
 
-//    glDisable(GL_TEXTURE_2D);
+//    glDisable(GL_TEXTURE0);
 }
