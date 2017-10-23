@@ -33,7 +33,7 @@ struct Vertex {
 struct Light {
   glm::vec4 position;
   glm::vec4 diffuse;
-  glm::vec3 direction;
+  glm::vec4 direction;
 };
 
 #endif /* GRAPHICS_HEADERS_H */

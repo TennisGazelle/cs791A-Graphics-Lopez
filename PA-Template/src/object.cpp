@@ -79,8 +79,8 @@ bool Object::LoadVerticiesFromFile(const std::string& filename) {
         //get position
         for (int j = 0; j < 3; j++) {
           tempVert.position[j] = aiScene->mMeshes[meshIndex]->mVertices[vertexIndex][j];
-          //tempVert.color[j] =  float(rand()%100) / 100.0f;
-          tempVert.color[j] = 0;
+          tempVert.color[j] =  float(rand()%100) / 100.0f;
+          //tempVert.color[j] = 0;
           tempVert.normal[j] = aiScene->mMeshes[meshIndex]->mNormals[vertexIndex][j];
         }
         

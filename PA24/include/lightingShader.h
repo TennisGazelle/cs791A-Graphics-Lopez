@@ -15,6 +15,7 @@ public:
     GLint modelMatrix;
     GLint mvMatrix;
     GLint mvpMatrix;
+    GLint lightViewMatrix;
     GLint gSampler;
     GLint gShadowMap;
     GLint light;

@@ -7,7 +7,6 @@
 
 #include "graphics_headers.h"
 
-
 class ShadowMapFBO {
 public:
     ShadowMapFBO();

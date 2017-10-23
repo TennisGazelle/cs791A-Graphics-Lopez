@@ -43,15 +43,15 @@ bool Graphics::Initialize(int width, int height) {
     // Create the object
     m_cube = new Object();
     m_floor = new Object();
-    if (!m_cube->Init("../meshes/Torus Knot.obj", "../textures/chrome_mercury.jpg")) {
+    if (!m_cube->Init("../meshes/Torus Knot.obj", "../textures/stone_floor.jpg")) {
         printf("Object failed to init\n");
         return false;
     }
-    if (!m_floor->Init("../meshes/plane.obj", "../textures/stone_floor.jpg")) {
+    if (!m_floor->Init("../meshes/plane.obj")) {
         printf("floor failed to init\n");
         return false;
     }
-    m_cube->setModel(glm::translate(glm::vec3(0, 5, 0)));
+    m_cube->setModel(glm::translate(glm::vec3(0, 2.5f, 0)));
 
     // Set up the shaders
     m_shader = new LightingShader();
@@ -78,9 +78,6 @@ bool Graphics::Initialize(int width, int height) {
         printf("Lighting shader didn't find some shaders\n");
         return false;
     }
-    // set the texture unit
-    glUniform1i(m_shader->gSampler, 0);
-    glUniform1i(m_shader->gShadowMap, 1);
 
     m_shadowMapShader = new ShadowMapShader();
     if (!m_shadowMapShader->Initialize()) {
@@ -112,7 +109,7 @@ bool Graphics::Initialize(int width, int height) {
     }
 
     // Locate the light information
-    m_spotlight.position = glm::vec4(glm::vec3(5), 1);
+    m_spotlight.position = glm::vec4(5, 2, 0, 1);
     m_spotlight.diffuse = glm::vec4(1, 1, 1, 0);
     m_spotlight.direction = glm::normalize(m_spotlight.position);
 
@@ -153,6 +150,14 @@ void Graphics::Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyP
             }
             break;
 
+        case SDLK_KP_2:
+            m_spotlight.direction.z += 0.25;
+            break;
+        case SDLK_KP_8:
+            m_spotlight.direction.z -= 0.25;
+            break;
+
+
         default:
             break;
     }
@@ -161,25 +166,28 @@ void Graphics::Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyP
 void Graphics::Update(unsigned int dt) {
     // Update the object
     m_cube->Update(dt);
+    // update the location of the light
+    static float angle = 0.01;
+    static glm::mat4 rotation = glm::translate(glm::vec3(5, 5, 0));
+    rotation = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0, 1, 0)) *rotation;
+    m_spotlight.position = rotation[3];
 }
 
 void Graphics::Render() {
     ShadowRenderPass();
-//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     LightingRenderPass();
 }
 
 void Graphics::ShadowRenderPass() {
     // clear the buffer
     m_shadowMapFBO->BindForWriting();
-    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_DEPTH_BUFFER_BIT);
 
     // set it up for writing
     m_shadowMapShader->Enable();
 
     // make the view from the light
-    glm::mat4 viewFromLight = glm::lookAt(glm::vec3(m_spotlight.position), m_spotlight.direction, glm::vec3(0, 1, 0));
+    glm::mat4 viewFromLight = glm::lookAt(glm::vec3(m_spotlight.position), glm::vec3(m_spotlight.direction), glm::vec3(0, 1, 0));
 
     // send in light
     glUniformMatrix4fv(m_shadowMapShader->projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
@@ -195,7 +203,7 @@ void Graphics::ShadowRenderPass() {
 }
 
 void Graphics::LightingRenderPass() {
-//    m_shadowMapFBO->BindForReading(GL_TEXTURE1);
+    m_shadowMapFBO->BindForReading(GL_TEXTURE1);
     //clear the screen
     glClearColor(0.0, 0.0, 0.2, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -203,13 +211,18 @@ void Graphics::LightingRenderPass() {
     // Start the correct program
     m_shader->Enable();
 
+    // set the texture unit
+    glUniform1i(m_shader->gSampler, 0);
+    glUniform1i(m_shader->gShadowMap, 1);
+
     // send in the light information to the shader
     glUniform4fv(m_shader->light, 1, glm::value_ptr(m_spotlight.position));
+    glm::mat4 viewFromLight = glm::lookAt(glm::vec3(m_spotlight.position), glm::vec3(m_spotlight.direction), glm::vec3(0, 1, 0));
 
     // Send in the projection aned view to the shader
     glUniformMatrix4fv(m_shader->projectionMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetProjection()));
     glUniformMatrix4fv(m_shader->viewMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetView()));
-
+    glUniformMatrix4fv(m_shader->lightViewMatrix, 1, GL_FALSE, glm::value_ptr(viewFromLight));
     glm::mat4 matrix;
     // Render the cube object
     matrix = m_camera->GetView() * m_cube->GetModel();
@@ -231,7 +244,7 @@ void Graphics::LightingRenderPass() {
     auto error = glGetError();
     if (error != GL_NO_ERROR) {
         string val = ErrorString(error);
-//        std::cout << "Error initializing OpenGL! " << error << ", " << val << std::endl;
+        std::cout << "Error initializing OpenGL! " << error << ", " << val << std::endl;
     }
 }
 

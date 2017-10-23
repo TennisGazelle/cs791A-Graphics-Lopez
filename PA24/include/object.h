@@ -10,7 +10,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/color4.h>
 #include <glm/gtx/vector_angle.hpp>
-#include <ImageMagick-7/Magick++.h>
+#include <Magick++.h>
 
 #include <fstream>
 #include <string>
@@ -36,8 +36,8 @@ private:
     std::vector<unsigned int> indices;
     GLuint VBO;
     GLuint IBO;
-    
     GLuint TBO;
+
     Magick::Blob blob;
     unsigned int m_texture_width, m_texture_height;
 
