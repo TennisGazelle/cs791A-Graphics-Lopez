@@ -224,6 +224,7 @@ void Graphics::LightingRenderPass() {
     glUniformMatrix4fv(m_shader->viewMatrix, 1, GL_FALSE, glm::value_ptr(m_camera->GetView()));
     glUniformMatrix4fv(m_shader->lightViewMatrix, 1, GL_FALSE, glm::value_ptr(viewFromLight));
     glm::mat4 matrix;
+    glUniform1i(m_shader->gShadowMap, 0);
     // Render the cube object
     matrix = m_camera->GetView() * m_cube->GetModel();
     glUniformMatrix4fv(m_shader->modelMatrix, 1, GL_FALSE, glm::value_ptr(m_cube->GetModel()));
