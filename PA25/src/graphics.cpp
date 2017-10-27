@@ -79,6 +79,17 @@ bool Graphics::Initialize(int width, int height) {
         return false;
     }
 
+    // DEBUGGING
+    // declare that skybox object and init it
+    skybox = new Skybox(m_camera);
+    if (!skybox->Init("../textures/SkyboxSet1/CloudyLightRays/",
+                      "CLRRight.png", "CLRLeft.png",
+                      "CLRUp.png", "CLRDown.png",
+                      "CLRFront.png", "CLRBack.png")) {
+        printf("skybox object failed to init in graphics object\n");
+        return false;
+    }
+
 //    m_shadowMapShader = new ShadowMapShader();
 //    if (!m_shadowMapShader->Initialize()) {
 //        printf("shadow map shader failed to init\n");
@@ -176,6 +187,11 @@ void Graphics::Update(unsigned int dt) {
 void Graphics::Render() {
 //    ShadowRenderPass();
     LightingRenderPass();
+    SkyboxRenderPass();
+}
+
+void Graphics::SkyboxRenderPass() {
+    skybox->Render();
 }
 
 void Graphics::ShadowRenderPass() {
@@ -244,7 +260,7 @@ void Graphics::LightingRenderPass() {
     auto error = glGetError();
     if (error != GL_NO_ERROR) {
         string val = ErrorString(error);
-        std::cout << "Error initializing OpenGL! " << error << ", " << val << std::endl;
+//        std::cout << "Error initializing OpenGL! " << error << ", " << val << std::endl;
     }
 }
 

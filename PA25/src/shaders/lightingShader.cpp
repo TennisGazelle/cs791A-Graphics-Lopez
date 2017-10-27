@@ -1,7 +1,7 @@
 #ifndef __LIGHTING_SHADER_CPP_
 #define __LIGHTING_SHADER_CPP_
 
-#include "lightingShader.h"
+#include "shaders/lightingShader.h"
 
 bool LightingShader::LinkShaderProps() {
     // Locate the projection matrix in the shader

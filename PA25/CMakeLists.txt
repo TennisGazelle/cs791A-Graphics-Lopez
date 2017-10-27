@@ -40,7 +40,7 @@ INCLUDE_DIRECTORIES(${INCLUDES})
 
 # Set sources
 FILE(GLOB_RECURSE SOURCES "src/*.cpp")
-ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES} src/cubeMapTexture.cpp include/cubeMapTexture.h)
+ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES} ${INCLUDES})
 
 add_custom_target("${PROJECT_NAME}_SUCCESSFUL" ALL
                   DEPENDS ${PROJECT_NAME}

@@ -9,18 +9,21 @@
 #include <string>
 #include <vector>
 #include <OpenGL/OpenGL.h>
+#include <map>
 
 using namespace std;
 
 class CubeMapTexture {
 public:
-    CubeMapTexture(const string& directory,
+    CubeMapTexture(string directory,
                    const string& posX, const string& negX,
                    const string& posY, const string& negY,
                    const string& posZ, const string& negZ);
-    void Load();
+
+    bool Load();
+    void Bind(GLenum textureUnit);
 private:
-    vector<string> filenames;
+    map<GLenum, string> faces;
     GLuint textureObj;
 };
 

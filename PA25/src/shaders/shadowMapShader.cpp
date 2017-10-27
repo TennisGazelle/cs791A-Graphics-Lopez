@@ -1,7 +1,7 @@
 #ifndef __SHADOW_MAP_SHADER_CPP_
 #define __SHADOW_MAP_SHADER_CPP_
 
-#include "shadowMapShader.h"
+#include "shaders/shadowMapShader.h"
 
 bool ShadowMapShader::LinkShaderProps() {
   // Locate the projection matrix in the shader

@@ -31,11 +31,11 @@ void Camera::resetValues() {
                                  100.0f); //Distance to the far plane,
 }
 
-glm::mat4 Camera::GetProjection() {
+glm::mat4 Camera::GetProjection() const {
   return projection;
 }
 
-glm::mat4 Camera::GetView() {
+glm::mat4 Camera::GetView() const {
   return view;
 }
 

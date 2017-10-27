@@ -7,10 +7,12 @@ using namespace std;
 
 #include "graphics_headers.h"
 #include "camera.h"
-#include "lightingShader.h"
-#include "shadowMapShader.h"
+#include "shaders/lightingShader.h"
+#include "shaders/shadowMapShader.h"
 #include "object.h"
 #include "shadowMapFBO.h"
+#include "cubeMapTexture.h"
+#include "skybox.h"
 
 class Graphics {
   public:
@@ -20,6 +22,7 @@ class Graphics {
     void Update(unsigned int dt);
     void Render();
     void ShadowRenderPass();
+    void SkyboxRenderPass();
     void LightingRenderPass();
     void Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyPressed);
 
@@ -35,6 +38,9 @@ class Graphics {
     Object *m_floor;
 
     Light m_spotlight;
+
+    // DEBUGGING
+    Skybox *skybox;
 };
 
 #endif /* GRAPHICS_H */
