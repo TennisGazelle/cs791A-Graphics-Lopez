@@ -83,7 +83,7 @@ bool Graphics::Initialize(int width, int height) {
     // declare that skybox object and init it
     skybox = new Skybox(m_camera);
     if (!skybox->Init("../textures/SkyboxSet1/CloudyLightRays/",
-                      "CLRRight.png", "CLRLeft.png",
+                      "CLRLeft.png", "CLRRight.png",
                       "CLRUp.png", "CLRDown.png",
                       "CLRFront.png", "CLRBack.png")) {
         printf("skybox object failed to init in graphics object\n");
@@ -134,20 +134,22 @@ bool Graphics::Initialize(int width, int height) {
 void Graphics::Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyPressed) {
     switch (keycode) {
         case SDLK_UP:
-            m_camera->moveForward_relative();
+            m_camera->tiltUpward();
+//            m_camera->moveForward_relative();
             break;
 
         case SDLK_DOWN:
-            m_camera->moveBackward_relative();
+            m_camera->tiltDownward();
+//            m_camera->moveBackward_relative();
             break;
 
         case SDLK_LEFT:
             if (shiftKeyPressed) {              // SHIFT + left, pivot left
                 m_spotlight.position.x += 0.25f;
             } else if (ctrlKeyPressed) {        // CTRL + left, move light left
-                m_camera->pivotLeft_aroundFocus();
-            } else {                            // left, move left
                 m_camera->moveLeft_relative();
+            } else {                            // left, move left
+                m_camera->pivotLeft_aroundFocus();
             }
             break;
 
@@ -155,9 +157,9 @@ void Graphics::Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyP
             if (shiftKeyPressed) {
                 m_spotlight.position.x -= 0.25f;
             } else if (ctrlKeyPressed) {
-                m_camera->pivotRight_aroundFocus();
-            } else {
                 m_camera->moveRight_relative();
+            } else {
+                m_camera->pivotRight_aroundFocus();
             }
             break;
 

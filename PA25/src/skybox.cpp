@@ -15,6 +15,10 @@ bool Skybox::Init(const string &dir,
     cubeMapTexture = new CubeMapTexture(dir, posX, negX, posY, negY, posZ, negZ);
     if (!cubeMapTexture)
         return false;
+    if (!cubeMapTexture->Load()) {
+        printf("cube mapping texture loading failed\n");
+        return false;
+    }
 
     // set up the shader correctly
     shader = new SkyboxShader();
@@ -49,6 +53,12 @@ bool Skybox::Init(const string &dir,
     return true;
 }
 
+void Skybox::ResetLocation() {
+    glm::mat4 matrix = sphere->GetModel();
+    matrix[3] = glm::vec4(camera->GetPositionOfCamera(), matrix[3][3]);
+    sphere->setModel(matrix);
+}
+
 void Skybox::Render() {
     shader->Enable();
 
@@ -59,6 +69,8 @@ void Skybox::Render() {
 
     glCullFace(GL_FRONT);
     glDepthFunc(GL_LEQUAL);
+
+    ResetLocation();
 
     // grab a big scale transformation
     glm::mat4 matrix = camera->GetProjection() * camera->GetView() * sphere->GetModel();

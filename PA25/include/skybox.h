@@ -22,6 +22,7 @@ public:
               const string& posZ, const string& negZ);
 
     void Render();
+    void ResetLocation();
 private:
     const Camera *camera;
     CubeMapTexture *cubeMapTexture;

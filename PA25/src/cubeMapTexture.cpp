@@ -33,7 +33,6 @@ bool CubeMapTexture::Load() {
 
     // load each image over
     for (auto face : faces) {
-        cout << "reading in: " << face.second << endl;
         texture.read(face.second);
         try {
             GLsizei width = (GLsizei) texture.columns();
