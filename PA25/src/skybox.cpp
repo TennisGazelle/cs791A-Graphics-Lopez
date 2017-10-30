@@ -13,8 +13,6 @@ bool Skybox::Init(const string &dir,
                   const string &posY, const string &negY,
                   const string &posZ, const string &negZ) {
     cubeMapTexture = new CubeMapTexture(dir, posX, negX, posY, negY, posZ, negZ);
-    if (!cubeMapTexture)
-        return false;
     if (!cubeMapTexture->Load()) {
         printf("cube mapping texture loading failed\n");
         return false;

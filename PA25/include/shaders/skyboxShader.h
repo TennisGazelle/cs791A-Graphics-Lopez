@@ -12,9 +12,7 @@ class SkyboxShader : public Shader {
 public:
     bool LinkShaderProps();
     GLint mvpMatrix;
-private:
 
-    GLuint textureLoc;
 };
 
 

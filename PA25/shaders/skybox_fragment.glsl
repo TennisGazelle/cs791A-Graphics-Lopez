@@ -8,5 +8,4 @@ uniform samplerCube gCubemapTexture;
 
 void main() {
     frag_color = texture(gCubemapTexture, uv);
-//    frag_color = vec4(uv, 1.0);
 }
