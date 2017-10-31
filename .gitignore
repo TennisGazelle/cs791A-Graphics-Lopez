@@ -33,3 +33,4 @@
 # Building directories
 PA*/*build*
 */.idea/*
+**.DS_Store
