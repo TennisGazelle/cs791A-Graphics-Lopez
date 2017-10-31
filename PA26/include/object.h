@@ -22,11 +22,10 @@ public:
     Object();
     ~Object();
     bool Init(const std::string& filename);
-    bool Init(const std::string& objFilename, const std::string& textureFilename);
     void Update(unsigned int dt);
     void Render();
     bool LoadVerticiesFromFile(const std::string& filename);
-    bool LoadTextureData(const std::string& filename);
+    void SetTextureID(const std::string& textID);
 
     glm::mat4 GetModel();
     void setModel(const glm::mat4& incomingMatrix);
@@ -37,10 +36,7 @@ private:
     std::vector<unsigned int> indices;
     GLuint VBO;
     GLuint IBO;
-    GLuint TBO;
-
-    Magick::Blob blob;
-    unsigned int m_texture_width, m_texture_height;
+    std::string textureID;
 
 };
 

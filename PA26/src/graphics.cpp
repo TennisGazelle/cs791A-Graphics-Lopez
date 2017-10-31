@@ -1,4 +1,5 @@
 #include <shadowMapFBO.h>
+#include <textureManager.h>
 #include "graphics.h"
 
 Graphics::Graphics() {
@@ -43,11 +44,11 @@ bool Graphics::Initialize(int width, int height) {
     // Create the object
     m_cube = new Object();
     m_floor = new Object();
-    if (!m_cube->Init("../meshes/Torus Knot.obj", "../textures/chrome_mercury.jpg")) {
+    if (!m_cube->Init("../meshes/Torus Knot.obj")) {
         printf("Object failed to init\n");
         return false;
     }
-    if (!m_floor->Init("../meshes/plane.obj", "../textures/stone_floor.jpg")) {
+    if (!m_floor->Init("../meshes/plane.obj")) {
         printf("floor failed to init\n");
         return false;
     }
@@ -123,6 +124,21 @@ bool Graphics::Initialize(int width, int height) {
     m_spotlight.position = glm::vec4(5, 2, 0, 1);
     m_spotlight.diffuse = glm::vec4(1, 1, 1, 0);
     m_spotlight.direction = glm::normalize(m_spotlight.position);
+
+    // load all the textures for the people
+    if (!TextureManager::getInstance()->initHandler(m_shader)) {
+        printf("unable to init texture manager handler\n");
+        return false;
+    }
+    if (!TextureManager::getInstance()->addTexture("bricks", "../textures/stone_floor.jpg")) {
+
+    }
+    if (!TextureManager::getInstance()->addTexture("chrome", "../textures/chrome_mercury.jpg")) {
+
+    }
+
+    m_cube->SetTextureID("chrome");
+    m_floor->SetTextureID("bricks");
 
     //enable depth testing
     glEnable(GL_DEPTH_TEST);

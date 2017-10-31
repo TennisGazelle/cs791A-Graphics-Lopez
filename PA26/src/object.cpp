@@ -1,9 +1,9 @@
+#include <textureManager.h>
 #include "object.h"
 
 Object::Object() {
     VBO = 0;
     IBO = 0;
-    TBO = 0;
 }
 
 // TODO safely delete the buffers from OpenGL
@@ -22,35 +22,6 @@ bool Object::Init(const std::string &filename) {
     glGenBuffers(1, &IBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_STATIC_DRAW);
-
-    return true;
-}
-
-bool Object::Init(const std::string &objFilename, const std::string &textureFilename) {
-    if (!LoadVerticiesFromFile(objFilename)) {
-        printf("Error loading file\n");
-        return false;
-    }
-
-    if (!LoadTextureData(textureFilename)) {
-        printf("Error loading texture file\n");
-        return false;
-    }
-
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-
-    glGenBuffers(1, &IBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_STATIC_DRAW);
-
-    glGenBuffers(1, &TBO);
-    glBindTexture(GL_TEXTURE_2D, TBO);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_texture_width, m_texture_height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                 blob.data());
 
     return true;
 }
@@ -86,7 +57,7 @@ bool Object::LoadVerticiesFromFile(const std::string &filename) {
                     tempVert.tangent[j] = aiScene->mMeshes[meshIndex]->mTangents[vertexIndex][j];
                 }
 
-                if (aiScene->mMeshes[meshIndex]->mTextureCoords) {
+                if (aiScene->mMeshes[meshIndex]->mTextureCoords != nullptr) {
                     tempVert.uv[0] = aiScene->mMeshes[meshIndex]->mTextureCoords[0][vertexIndex][0];
                     tempVert.uv[1] = aiScene->mMeshes[meshIndex]->mTextureCoords[0][vertexIndex][1];
                 }
@@ -101,14 +72,8 @@ bool Object::LoadVerticiesFromFile(const std::string &filename) {
     return true;
 }
 
-bool Object::LoadTextureData(const std::string &filename) {
-    Magick::Image texture;
-    texture.read(filename);
-    m_texture_width = texture.columns();
-    m_texture_height = texture.rows();
-    texture.write(&blob, "RGBA");
-
-    return true;
+void Object::SetTextureID(const std::string &textID) {
+    textureID = textID;
 }
 
 void Object::Update(unsigned int dt) {
@@ -125,12 +90,6 @@ void Object::setModel(const glm::mat4 &incomingMatrix) {
 }
 
 void Object::Render() {
-    if (TBO != 0) {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, TBO);
-    }
-
-
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
@@ -145,6 +104,12 @@ void Object::Render() {
     glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *) offsetof(Vertex, uv));
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+
+    // if my textureID is not the null string, ask the manager to activate it
+    if (!textureID.empty()) {
+        TextureManager::getInstance()->setTextureUnit(0);
+        TextureManager::getInstance()->enableTexture(textureID, GL_TEXTURE0);
+    }
 
     glDrawElements(GL_TRIANGLES, (GLsizei) indices.size(), GL_UNSIGNED_INT, 0);
 
