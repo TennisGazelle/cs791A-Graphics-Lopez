@@ -35,7 +35,7 @@ INCLUDE_DIRECTORIES(
 
 
 # Set Includes
-SET(INCLUDES ${PROJECT_SOURCE_DIR}/include include/Vertex.h)
+SET(INCLUDES ${PROJECT_SOURCE_DIR}/include)
 INCLUDE_DIRECTORIES(${INCLUDES})
 
 # Set sources
