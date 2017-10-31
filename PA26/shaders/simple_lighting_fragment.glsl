@@ -51,7 +51,7 @@ void main(void) {
 
   MatDiffuseColor = texture(gSampler, uv.xy);
 
-  vec3 n = normalize(vNormInWorld);
+  vec3 n = CalcBumpedNormal();
   vec3 l = normalize(vertToLight);
   vec3 e = normalize(vertToCam);
   vec3 r = normalize(-reflect(l, n));
@@ -64,7 +64,7 @@ void main(void) {
     // ambient - for indirect lighting
     MatAmbientColor +
     // diffuse - color of the object
-    1 * (MatDiffuseColor * LightColor * LightPower * cosTheta / (distanceSquared) +
+    shadowFactor * (MatDiffuseColor * LightColor * LightPower * cosTheta / (distanceSquared) +
     // specular - reflective highlights
     MatSpecularColor * LightColor * LightPower * pow(cosAlpha, 2) / (distanceSquared));
 

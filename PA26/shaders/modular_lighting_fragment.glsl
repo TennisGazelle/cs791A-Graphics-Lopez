@@ -46,6 +46,7 @@ uniform PointLight gPointLights[MAX_POINT_LIGHTS];
 uniform SpotLight gSpotLights[MAX_SPOT_LIGHTS];
 uniform sampler2D gSampler;
 uniform sampler2D gShadowMap;
+uniform sampler2D gNormalMap;
 uniform vec3 gEyeWorldPos;
 uniform float gMatSpecularIntensity;
 uniform float gSpecularPower;

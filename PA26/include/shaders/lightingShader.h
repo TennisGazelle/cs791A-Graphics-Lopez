@@ -18,6 +18,7 @@ public:
     GLint lightViewMatrix;
     GLint gSampler;
     GLint gShadowMap;
+    GLint gNormalMap;
     GLint light;
 
     struct {

@@ -62,6 +62,12 @@ bool LightingShader::LinkShaderProps() {
         printf("g Sampler in light shader not found\n");
         return false;
     }
+
+    gNormalMap = GetUniformLocation("gNormalMap");
+    if (gNormalMap == INVALID_UNIFORM_LOCATION) {
+        printf("gNormalMap not found in light shader\n");
+        return false;
+    }
     return true;
 }
 

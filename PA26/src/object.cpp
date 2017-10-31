@@ -119,5 +119,8 @@ void Object::Render() {
     glDisableVertexAttribArray(3);
     glDisableVertexAttribArray(4);
 
-//    glDisable(GL_TEXTURE0);
+    if (!textureID.empty()) {
+        TextureManager::getInstance()->disableTexture(textureID);
+    }
+
 }

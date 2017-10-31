@@ -91,34 +91,34 @@ bool Graphics::Initialize(int width, int height) {
         return false;
     }
 
-//    m_shadowMapShader = new ShadowMapShader();
-//    if (!m_shadowMapShader->Initialize()) {
-//        printf("shadow map shader failed to init\n");
-//        return false;
-//    }
-//    if (!m_shadowMapShader->LoadShader(GL_VERTEX_SHADER, "../shaders/shadow_map_vertex.glsl")) {
-//        printf("shadow map vertex failed to init\n");
-//        return false;
-//    }
-//    if (!m_shadowMapShader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/shadow_map_fragment.glsl")) {
-//        printf("shadow map vertex shader failed to init\n");
-//        return false;
-//    }
-//    if (!m_shadowMapShader->Finalize()) {
-//        printf("shader failed to finalize\n");
-//        return false;
-//    }
-//    if (!m_shadowMapShader->LinkShaderProps()) {
-//        printf("Shadow shader didn't find some variables\n");
-//        return false;
-//    }
-//
-//    // create the frame buffer
-//    m_shadowMapFBO = new ShadowMapFBO();
-//    if (!m_shadowMapFBO->Init(width, height)) {
-//        printf("error with init fbo\n");
-//        return false;
-//    }
+    m_shadowMapShader = new ShadowMapShader();
+    if (!m_shadowMapShader->Initialize()) {
+        printf("shadow map shader failed to init\n");
+        return false;
+    }
+    if (!m_shadowMapShader->LoadShader(GL_VERTEX_SHADER, "../shaders/shadow_map_vertex.glsl")) {
+        printf("shadow map vertex failed to init\n");
+        return false;
+    }
+    if (!m_shadowMapShader->LoadShader(GL_FRAGMENT_SHADER, "../shaders/shadow_map_fragment.glsl")) {
+        printf("shadow map vertex shader failed to init\n");
+        return false;
+    }
+    if (!m_shadowMapShader->Finalize()) {
+        printf("shader failed to finalize\n");
+        return false;
+    }
+    if (!m_shadowMapShader->LinkShaderProps()) {
+        printf("Shadow shader didn't find some variables\n");
+        return false;
+    }
+
+    // create the frame buffer
+    m_shadowMapFBO = new ShadowMapFBO();
+    if (!m_shadowMapFBO->Init(width, height)) {
+        printf("error with init fbo\n");
+        return false;
+    }
 
     // Locate the light information
     m_spotlight.position = glm::vec4(5, 2, 0, 1);
@@ -130,15 +130,25 @@ bool Graphics::Initialize(int width, int height) {
         printf("unable to init texture manager handler\n");
         return false;
     }
-    if (!TextureManager::getInstance()->addTexture("bricks", "../textures/stone_floor.jpg")) {
-
+    if (!TextureManager::getInstance()->addTexture("stone", "../textures/stone_floor.jpg")) {
+        printf("stone didn't load\n");
+        return false;
     }
     if (!TextureManager::getInstance()->addTexture("chrome", "../textures/chrome_mercury.jpg")) {
-
+        printf("chrome didn't load\n");
+        return false;
+    }
+    if (!TextureManager::getInstance()->addTexture("bricks", "../textures/brickwork.jpg") ||
+        !TextureManager::getInstance()->addTexture("bricks_normal", "../textures/brickwork-normal.jpg") ||
+        !TextureManager::getInstance()->addTexture("basic_normal", "../textures/normal_up.jpg")) {
+        printf("bricks/bricks normal didn't load\n");
+        return false;
     }
 
     m_cube->SetTextureID("chrome");
     m_floor->SetTextureID("bricks");
+
+    bumpMappingEnabled = false;
 
     //enable depth testing
     glEnable(GL_DEPTH_TEST);
@@ -203,7 +213,7 @@ void Graphics::Update(unsigned int dt) {
 }
 
 void Graphics::Render() {
-//    ShadowRenderPass();
+    ShadowRenderPass();
     LightingRenderPass();
     SkyboxRenderPass();
 }
@@ -238,7 +248,7 @@ void Graphics::ShadowRenderPass() {
 
 void Graphics::LightingRenderPass() {
     glm::mat4 matrix;
-//    m_shadowMapFBO->BindForReading(GL_TEXTURE1);
+    m_shadowMapFBO->BindForReading(GL_TEXTURE1);
     //clear the screen
     glClearColor(0.0, 0.0, 0.2, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -248,6 +258,12 @@ void Graphics::LightingRenderPass() {
 
     // set the texture unit
     glUniform1i(m_shader->gSampler, 0);
+    glUniform1i(m_shader->gShadowMap, 1);
+    glUniform1i(m_shader->gNormalMap, 2);
+
+    // set the default normal map for everyone
+    TextureManager::getInstance()->setTextureUnit(2);
+    TextureManager::getInstance()->enableTexture("basic_normal", GL_TEXTURE2);
 
     // send in the light information to the shader
     glUniform4fv(m_shader->light, 1, glm::value_ptr(m_spotlight.position));
@@ -272,6 +288,8 @@ void Graphics::LightingRenderPass() {
     glUniformMatrix4fv(m_shader->mvMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
     matrix = m_camera->GetProjection() * matrix;
     glUniformMatrix4fv(m_shader->mvpMatrix, 1, GL_FALSE, glm::value_ptr(matrix));
+    TextureManager::getInstance()->setTextureUnit(0);
+    TextureManager::getInstance()->enableTexture("bricks_normal", GL_TEXTURE2);
     m_floor->Render();
 
     // Get any errors from OpenGL

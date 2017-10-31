@@ -39,6 +39,8 @@ class Graphics {
 
     Light m_spotlight;
 
+    bool bumpMappingEnabled;
+
     // DEBUGGING
     Skybox *skybox;
 };
