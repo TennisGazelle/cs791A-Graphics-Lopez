@@ -50,3 +50,10 @@ void TextureManager::disableTexture(string textName) {
         textures[textName]->disable();
     }
 }
+
+Texture* TextureManager::getTexture(string textName) const {
+    if (textures.find(textName) != textures.end()) {
+        return textures.at(textName);
+    }
+    return nullptr;
+}

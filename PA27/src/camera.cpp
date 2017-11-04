@@ -39,6 +39,10 @@ glm::mat4 Camera::GetView() const {
     return view;
 }
 
+glm::mat4 Camera::GetVP() const {
+    return projection * view;
+}
+
 glm::vec3 Camera::GetPositionOfCamera() const {
     return position;
 }

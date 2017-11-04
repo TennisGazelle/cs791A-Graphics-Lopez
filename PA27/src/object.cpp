@@ -29,7 +29,7 @@ bool Object::Init(const std::string &filename) {
 bool Object::LoadVerticiesFromFile(const std::string &filename) {
     //declare incoming variables stuff
     Assimp::Importer importer;
-    const aiScene *aiScene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_CalcTangentSpace);
+    const aiScene *aiScene = importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenNormals);
     if (aiScene == nullptr) {
         std::cerr << "File contents had problems but was successfully opened." << std::endl;
         return false;
@@ -42,12 +42,10 @@ bool Object::LoadVerticiesFromFile(const std::string &filename) {
         for (int faceIndex = 0; faceIndex < numFacesInMesh; faceIndex++) {
             //helper
             Vertex tempVert(glm::vec3(0.0), glm::vec3(0.0), glm::vec3(0.0), glm::vec3(0.0), glm::vec2(-1.0f));
-
             //get val from faces' mIndeces array
             for (int i = 0; i < 3; i++) {
                 //go to aiMesh's mVertices Array
                 unsigned int vertexIndex = aiScene->mMeshes[meshIndex]->mFaces[faceIndex].mIndices[i];
-
                 //get position
                 for (int j = 0; j < 3; j++) {
                     tempVert.position[j] = aiScene->mMeshes[meshIndex]->mVertices[vertexIndex][j];

@@ -44,12 +44,17 @@ bool Graphics::Initialize(int width, int height) {
     // Create the object
     m_cube = new Object();
     m_floor = new Object();
+    m_quad = new Object();
     if (!m_cube->Init("../meshes/Torus Knot.obj")) {
         printf("Object failed to init\n");
         return false;
     }
     if (!m_floor->Init("../meshes/plane.obj")) {
         printf("floor failed to init\n");
+        return false;
+    }
+    if (!m_quad->Init("../meshes/quad.obj")) {
+        printf("single quad failed to int\n");
         return false;
     }
     m_cube->setModel(glm::translate(glm::vec3(0, 2.5f, 0)));
@@ -80,7 +85,6 @@ bool Graphics::Initialize(int width, int height) {
         return false;
     }
 
-    // DEBUGGING
     // declare that skybox object and init it
     skybox = new Skybox(m_camera);
     if (!skybox->Init("../textures/SkyboxSet1/CloudyLightRays/",
@@ -126,21 +130,21 @@ bool Graphics::Initialize(int width, int height) {
     m_spotlight.direction = glm::normalize(m_spotlight.position);
 
     // load all the textures for the people
-    if (!TextureManager::getInstance()->initHandler(m_shader)) {
+    if (!TMInstance->initHandler(m_shader)) {
         printf("unable to init texture manager handler\n");
         return false;
     }
-    if (!TextureManager::getInstance()->addTexture("stone", "../textures/stone_floor.jpg")) {
+    if (!TMInstance->addTexture("stone", "../textures/stone_floor.jpg")) {
         printf("stone didn't load\n");
         return false;
     }
-    if (!TextureManager::getInstance()->addTexture("chrome", "../textures/chrome_mercury.jpg")) {
+    if (!TMInstance->addTexture("chrome", "../textures/chrome_mercury.jpg")) {
         printf("chrome didn't load\n");
         return false;
     }
-    if (!TextureManager::getInstance()->addTexture("bricks", "../textures/brickwork.jpg") ||
-        !TextureManager::getInstance()->addTexture("bricks_normal", "../textures/brickwork-normal.jpg") ||
-        !TextureManager::getInstance()->addTexture("basic_normal", "../textures/normal_up.jpg")) {
+    if (!TMInstance->addTexture("bricks", "../textures/brickwork.jpg") ||
+        !TMInstance->addTexture("bricks_normal", "../textures/brickwork-normal.jpg") ||
+        !TMInstance->addTexture("basic_normal", "../textures/normal_up.jpg")) {
         printf("bricks/bricks normal didn't load\n");
         return false;
     }
@@ -148,7 +152,8 @@ bool Graphics::Initialize(int width, int height) {
     m_cube->SetTextureID("chrome");
     m_floor->SetTextureID("bricks");
 
-    bumpMappingEnabled = false;
+    // Set up the billboard with a new texture
+    m_bblist.Init("../textures/brickwork.jpg");
 
     //enable depth testing
     glEnable(GL_DEPTH_TEST);
@@ -216,6 +221,7 @@ void Graphics::Render() {
     ShadowRenderPass();
     LightingRenderPass();
     SkyboxRenderPass();
+    GeometryRenderPass();
 }
 
 void Graphics::SkyboxRenderPass() {
@@ -298,6 +304,10 @@ void Graphics::LightingRenderPass() {
         string val = ErrorString(error);
 //        std::cout << "Error initializing OpenGL! " << error << ", " << val << std::endl;
     }
+}
+
+void Graphics::GeometryRenderPass() {
+    m_bblist.Render(m_camera->GetVP(), m_camera->GetPositionOfCamera());
 }
 
 std::string Graphics::ErrorString(GLenum error) {

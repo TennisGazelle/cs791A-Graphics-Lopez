@@ -13,6 +13,7 @@ class Camera {
     void resetValues();
     glm::mat4 GetProjection() const;
     glm::mat4 GetView() const;
+    glm::mat4 GetVP() const;
     glm::vec3 GetPositionOfCamera() const;
 
     void moveForward_relative(double distance = DEFAULT_TRANSLATION_DISTANCE);

@@ -24,6 +24,8 @@ public:
     void enableTexture(string textName, GLenum textureUnit);
     void disableTexture(string textName);
 
+    Texture* getTexture(string textName) const;
+
 private:
     TextureManager();
 
@@ -32,5 +34,6 @@ private:
     map<string, Texture*> textures;
 };
 
+#define TMInstance TextureManager::getInstance()
 
 #endif //TUTORIAL_TEXTUREMANAGER_H

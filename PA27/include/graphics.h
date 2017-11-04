@@ -13,6 +13,7 @@ using namespace std;
 #include "shadowMapFBO.h"
 #include "cubeMapTexture.h"
 #include "skybox.h"
+#include "billboardList.h"
 
 class Graphics {
   public:
@@ -24,6 +25,7 @@ class Graphics {
     void ShadowRenderPass();
     void SkyboxRenderPass();
     void LightingRenderPass();
+    void GeometryRenderPass();
     void Keyboard(SDL_Keycode keycode, bool shiftKeyPressed, bool ctrlKeyPressed);
 
   private:
@@ -36,10 +38,11 @@ class Graphics {
 
     Object *m_cube;
     Object *m_floor;
+    Object *m_quad;
+
+    BillboardList m_bblist;
 
     Light m_spotlight;
-
-    bool bumpMappingEnabled;
 
     // DEBUGGING
     Skybox *skybox;
