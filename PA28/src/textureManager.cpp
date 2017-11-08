@@ -25,7 +25,7 @@ bool TextureManager::initHandler(Shader *shaderManager) {
 bool TextureManager::addTexture(const string textName, string fileName) {
     auto* texture = new Texture;
 
-    if (!texture->loadTexture(fileName)){
+    if (!texture->loadTexture(fileName)) {
         printf("texture manager couldn't add texture with filename %s", fileName.c_str());
         return false;
     }

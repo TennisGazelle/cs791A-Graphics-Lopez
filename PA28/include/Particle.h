@@ -8,6 +8,7 @@
 #include "graphics_headers.h"
 
 struct Particle {
+    Particle() : type(0.0), position(glm::vec3()), velocity(glm::vec3()), lifetimeMillis(0) {}
     float type;
     glm::vec3 position;
     glm::vec3 velocity;

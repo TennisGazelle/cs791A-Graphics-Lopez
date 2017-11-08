@@ -56,7 +56,7 @@ void BillboardList::Render(const glm::mat4 &viewProjection, const glm::vec3 &cam
     glUniform3fv(bbShader->cameraPosition, 1, glm::value_ptr(cameraPosWorldSpace));
     // bind our texture to color
     billboardTexture->enable(COLOR_TEXTURE_UNIT);
-    glUniform1i(bbShader->colorMap, 0);
+    glUniform1i(bbShader->colorMap, COLOR_TEXTURE_UNIT_INDEX);
     TMInstance->setTextureUnit(0);
     TMInstance->enableTexture("dickbutt", COLOR_TEXTURE_UNIT);
 

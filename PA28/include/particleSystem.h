@@ -11,8 +11,10 @@
 #include "texture.h"
 #include "randomTexture.h"
 
-const static unsigned int MAX_PARTICLES = 100;
-const static float PARTICLE_TYPE_LAUNCHER = 1.0;
+const static unsigned int MAX_PARTICLES = 1000;
+const static float PARTICLE_TYPE_LAUNCHER = 0.0;
+const static float PARTICLE_TYPE_SHELL = 1.0f;
+const static float PARTICLE_TYPE_SECONDARY_SHELL = 2.0f;
 
 class ParticleSystem {
 public:

@@ -42,6 +42,7 @@ bool ParticleSystem::Init(const glm::vec3 &position) {
     }
     cout << "after binding" << endl;
     psuShader->Enable();
+
     // set random texture unit
     glUniform1i(psuShader->randomTexture, RANDOM_TEXTURE_UNIT_INDEX);
     // set launcher lifetime
@@ -76,7 +77,7 @@ bool ParticleSystem::Init(const glm::vec3 &position) {
     // set color texture unit index
     glUniform1i(bbShader->colorMap, COLOR_TEXTURE_UNIT_INDEX);
     // set billboard size
-    glUniform1f(bbShader->size, 0.01f);
+    glUniform1f(bbShader->size, 0.1f);
 
     cout << "after billboard" << endl;
 
@@ -132,7 +133,7 @@ void ParticleSystem::UpdateParticles(unsigned int deltaTimeMillis) {
         isFirst = false;
     } else {
         glDrawTransformFeedback(GL_POINTS, transformFeedback[currentVB]);
-        isFirst = true;
+//        isFirst = true;
     }
     glEndTransformFeedback();
     glDisableVertexAttribArray(0);
